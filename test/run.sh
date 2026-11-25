@@ -47,7 +47,14 @@ step "browser smoke test"
 export NODE_PATH="${NODE_PATH:-$HOME/.topo-tools/node_modules}"
 if node -e "require('playwright')" 2>/dev/null; then
   for page in maps/*/dist/index.html gallery/*/dist/index.html; do
-    run node test/smoke.cjs "$page" "$LOGS/$(basename "$(dirname "$(dirname "$page")")")"
+    node test/smoke.cjs "$page" "$LOGS/$(basename "$(dirname "$(dirname "$page")")")"
+    rc=$?
+    if [ "$rc" -eq 77 ] && [ -z "${CI:-}" ]; then
+      echo "smoke test skipped for $page (browser could not start in this environment)"
+    elif [ "$rc" -ne 0 ]; then
+      echo "FAILED: node test/smoke.cjs $page"
+      fail=1
+    fi
   done
 else
   echo "no Playwright at $NODE_PATH: smoke test skipped (see the comment at the top of this file)"

@@ -17,8 +17,18 @@ if (!page_) { console.error('usage: node test/smoke.cjs PAGE.html OUTDIR [--d3 d
 if (!fs.existsSync(page_)) { console.error(`smoke: no page at ${path.resolve(page_)}`); process.exit(2); }
 fs.mkdirSync(out, { recursive: true });
 
+const LAUNCH_SKIP_CODE = 77;
+
 (async () => {
-  const browser = await chromium.launch();
+  let browser;
+  try {
+    browser = await chromium.launch();
+  } catch (e) {
+    const firstLine = String((e && e.message) || e || '').split(/\r?\n/).find(l => l.trim()) || 'unknown error';
+    const cmd = `node test/smoke.cjs ${page_} ${out}${d3i > -1 ? ` --d3 ${args[d3i + 1]}` : ''}`;
+    console.error(`smoke: could not start headless Chromium (${firstLine}); run outside the sandbox: ${cmd}`);
+    process.exit(LAUNCH_SKIP_CODE);
+  }
   let failed = false;
   const views = [
     ['desktop-light', { width: 1440, height: 860 }, 'light'],
