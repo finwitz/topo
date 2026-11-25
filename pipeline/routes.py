@@ -6,9 +6,11 @@ Hand the list to every mapping agent: the area that owns a route creates its end
 every other area, or another application, that calls it uses the same `ep:<service> <METHOD> <path>`
 id. It also makes the routes that callers use but no server declares stand out at merge.
 
-Reads FastAPI (APIRouter prefixes and include_router prefixes), Flask (@app.route with methods) and
-Express-style JavaScript or TypeScript (router.get('/path', ...)). Paths come out as declared, with
-the router prefix; tests are skipped. Read the result: a route registered dynamically will not appear.
+Reads FastAPI (APIRouter prefixes and include_router prefixes), Flask (@app.route with methods),
+Express-style JavaScript or TypeScript (router.get('/path', ...)) and Go (net/http HandleFunc,
+Gin/Echo groups, and chi Route blocks; http.Handle and chi Mount are not yet read, and Go Group
+variables are tracked per file by name). Paths come out as declared, with the router prefix; tests
+are skipped. Read the result: a route registered dynamically will not appear.
 """
 import argparse
 import json
@@ -21,12 +23,65 @@ PY_ROUTER = re.compile(r'(\w+)\s*=\s*(?:APIRouter|Blueprint)\(([^)]*)\)', re.S)
 PY_PREFIX = re.compile(r'(?:prefix|url_prefix)\s*=\s*["\']([^"\']*)["\']')
 PY_INCLUDE = re.compile(r'include_router\(\s*([\w.]+)(?:\s*,[^)]*?prefix\s*=\s*["\']([^"\']*)["\'])?')
 JS_ROUTE = re.compile(r'\b(?:router|app|server|api)\.(get|post|put|patch|delete)\(\s*[`"\']([^`"\']+)[`"\']')
+GO_GROUP = re.compile(r'\b(\w+)\s*:?=\s*(\w+)\.Group\(\s*["`]([^"`]*)["`]')
+GO_CHI_ROUTE = re.compile(r'\b(\w+)\.Route\(\s*["`]([^"`]*)["`]\s*,\s*func\(\s*(\w+)\b')
+GO_HANDLE = re.compile(r'\b\w+\.HandleFunc\(\s*["`]([^"`]+)["`]')
+GO_METHOD = re.compile(r'\b(\w+)\.(GET|POST|PUT|PATCH|DELETE|Get|Post|Put|Patch|Delete)\(\s*["`]([^"`]*)["`]')
 SKIP_DIRS = {"node_modules", ".git", "__pycache__", "dist", "build", ".venv", "venv"}
 
 
 def is_test(path):
     base = os.path.basename(path)
-    return "/tests/" in path or "/test/" in path or base.startswith("test_") or ".test." in base or ".spec." in base
+    return (
+        "/tests/" in path
+        or "/test/" in path
+        or base.startswith("test_")
+        or base.endswith("_test.go")
+        or ".test." in base
+        or ".spec." in base
+    )
+
+
+def _join_path(prefix, path):
+    joined = (prefix.rstrip("/") + "/" + path.lstrip("/")) if (prefix and path) else (prefix or path or "/")
+    return joined if joined.startswith("/") else "/" + joined
+
+
+def _collect_go(text, rel):
+    rows = []
+    groups = {}
+    route_stack = []  # [(brace_depth_after_open, inner_var, prefix)]
+    depth = 0
+    for lineno, line in enumerate(text.splitlines(), 1):
+        code = line.split("//", 1)[0]
+        gm = GO_GROUP.search(code)
+        if gm:
+            var, parent, prefix = gm.groups()
+            groups[var] = _join_path(groups.get(parent, ""), prefix)
+        rm = GO_CHI_ROUTE.search(code)
+        if rm:
+            parent, prefix, inner_var = rm.groups()
+            base_prefix = next((p for _, v, p in reversed(route_stack) if v == parent), groups.get(parent, ""))
+            route_stack.append((depth + code.count("{") - code.count("}"), inner_var, _join_path(base_prefix, prefix)))
+        for hm in GO_HANDLE.finditer(code):
+            raw = hm.group(1).strip()
+            parts = raw.split(None, 1)
+            if len(parts) == 2 and parts[0].upper() in {"GET", "POST", "PUT", "PATCH", "DELETE"}:
+                method, path = parts[0].upper(), parts[1]
+            else:
+                method, path = "GET", raw
+            if path.startswith("/"):
+                rows.append((method, path, f"{rel}:{lineno}"))
+        for mm in GO_METHOD.finditer(code):
+            var, method, path = mm.groups()
+            if not path.startswith("/"):
+                continue
+            prefix = next((p for _, v, p in reversed(route_stack) if v == var), groups.get(var, ""))
+            rows.append((method.upper(), _join_path(prefix, path), f"{rel}:{lineno}"))
+        depth += code.count("{") - code.count("}")
+        while route_stack and depth < route_stack[-1][0]:
+            route_stack.pop()
+    return rows
 
 
 def walk(root, exts):
@@ -73,6 +128,9 @@ def collect(checkout, folder="."):
         for m in JS_ROUTE.finditer(text):
             if m.group(2).startswith("/"):
                 rows.append((m.group(1).upper(), m.group(2), f"{rel}:{text.count(chr(10), 0, m.start()) + 1}"))
+    for f in sorted(walk(base, (".go",))):
+        text = open(f, encoding="utf-8", errors="replace").read()
+        rows.extend(_collect_go(text, os.path.relpath(f, checkout)))
     return sorted(set(rows), key=lambda r: (r[1], r[0]))
 
 
