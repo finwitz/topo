@@ -93,6 +93,32 @@ const LAUNCH_SKIP_CODE = 77;
       await page.evaluate(() => window.__topo.select(null));
     }
     if (ids.flow) { await page.evaluate(f => window.__topo.startFlow(f), ids.flow); await page.waitForTimeout(1200); await shot('flow'); }
+    // the Features view, where the map has a feature tree: every feature drawn, no sideways scroll,
+    // Escape closes it, and a feature lights up its boxes on the map
+    if (await page.evaluate(() => !document.querySelector('#btn-features').hidden)) {
+      if (ids.flow) await page.keyboard.press('Escape');
+      await page.click('#btn-features');
+      await page.waitForTimeout(400);
+      await shot('features');
+      const fv = await page.evaluate(() => {
+        const data = JSON.parse(document.getElementById('topo-data').textContent), f = document.getElementById('fview');
+        return { want: data.features.length - data.features.filter(x => !x.parent && data.features.some(k => k.parent === x.id)).length,
+          got: document.querySelectorAll('.fv-leaf[data-feat]').length, overflow: f.scrollWidth > f.clientWidth + 1,
+          lines: document.querySelectorAll('#fv-lines path').length, areas: document.querySelectorAll('.fv-area').length };
+      });
+      if (fv.got !== fv.want) problems.push(`the Features view draws ${fv.got} features of ${fv.want}`);
+      if (fv.overflow) problems.push('the Features view scrolls sideways');
+      if (desktop && fv.lines < fv.areas) problems.push(`the Features view draws ${fv.lines} lines for ${fv.areas} areas`);
+      await page.keyboard.press('Escape');
+      if (!(await page.evaluate(() => document.getElementById('fview').hidden))) problems.push('Escape leaves the Features view open');
+      await page.click('#btn-features');
+      await page.click('.fv-leaf[data-feat]');
+      await page.waitForTimeout(800);
+      const lit = await page.evaluate(() => !document.getElementById('capbar').hidden && /Feature/.test(document.getElementById('capbar').textContent));
+      if (!lit) problems.push('a feature does not light up its boxes on the map');
+      await shot('feature-on-map');
+      await page.keyboard.press('Escape');
+    }
     const fps = await page.evaluate(async () => {
       const t0 = performance.now(); let frames = 0;
       await new Promise(res => { const tick = () => { frames++; window.dispatchEvent(new Event('resize')); performance.now() - t0 < 1000 ? requestAnimationFrame(tick) : res(); }; requestAnimationFrame(tick); });

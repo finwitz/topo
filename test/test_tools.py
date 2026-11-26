@@ -517,5 +517,103 @@ class Abbrev(unittest.TestCase):
             self.assertIn("decisions", r.stdout)
 
 
+class Features(unittest.TestCase):
+    """features.py: the feature tree's check, its derived statuses, the reference list's searches, and build.py embedding it."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.m = os.path.join(self.tmp.name, "m")
+        os.makedirs(self.m)
+        self.co = os.path.join(self.m, "checkout")
+        os.makedirs(os.path.join(self.co, "shop"))
+        Path(self.co, "shop", "cart.py").write_text("def add_line(): ...\n\ndef save_for_later(cart): ...\n")
+        nodes = [
+            {"id": "app:shop", "kind": "app", "name": "Shop"},
+            {"id": "shop.cart", "parent": "app:shop", "kind": "group", "name": "Cart", "summary": "s"},
+            {"id": "f:shop/cart.py", "parent": "shop.cart", "kind": "module", "name": "Cart lines", "summary": "s"},
+            {"id": "f:shop/cart.py#add_line", "parent": "f:shop/cart.py", "kind": "function", "name": "add_line()"},
+            {"id": "f:shop/gift.py", "parent": "shop.cart", "kind": "module", "name": "Gift cards", "summary": "s", "status": "partial"},
+            {"id": "ep:shop POST /cart", "parent": "shop.cart", "kind": "endpoint", "name": "POST /cart"},
+            {"id": "f:shop/docs.md", "parent": "app:shop", "kind": "doc", "name": "Loyalty", "summary": "s", "source": "docs"}]
+        flows = [{"id": "flow.add", "name": "Add a line", "steps": [{"node": "ep:shop POST /cart"}, {"node": "f:shop/cart.py#add_line"}]}]
+        self.data = {"meta": {"title": "Shop"}, "nodes": nodes, "edges": [], "flows": flows}
+        Path(self.m, "topo-data.json").write_text(json.dumps(self.data))
+        self.doc = {"features": [
+            {"id": "feat.cart", "name": "Cart", "summary": "Shoppers build a cart."},
+            {"id": "feat.cart.lines", "parent": "feat.cart", "name": "Cart lines", "summary": "Add lines.",
+             "entry": ["ep:shop POST /cart"], "boxes": ["f:shop/cart.py"], "flows": ["flow.add"]},
+            {"id": "feat.cart.gift", "parent": "feat.cart", "name": "Gift cards", "summary": "Pay with a gift card.",
+             "boxes": ["f:shop/gift.py"]},
+            {"id": "feat.loyalty", "name": "Loyalty", "summary": "Points.", "boxes": ["f:shop/docs.md"]}],
+            "reference": {"name": "Roadmap", "items": [
+                {"text": "Gift cards", "state": "matched", "feature": "feat.cart.gift"},
+                {"text": "Saved carts", "state": "not found", "searched": ["save for later", "saved cart"]},
+                {"text": "Wishlists", "state": "not found", "searched": ["wishlist"]},
+                {"text": "Marketplace", "state": "out of scope"}]}}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def run_check(self, doc):
+        Path(self.m, "features.json").write_text(json.dumps(doc))
+        return tool("features.py", "check", self.m)
+
+    def test_a_good_tree_and_what_it_derives(self):
+        r = self.run_check(self.doc)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("endpoints claimed by a feature: 1/1", r.stdout)
+        self.assertIn("1 matched, 1 not found, 1 to check by hand, 1 out of scope", r.stdout)
+        saved = json.loads(Path(self.m, "features.json").read_text())
+        self.assertEqual(saved["reference"]["items"][1]["found"], ["checkout/shop/cart.py:3"])
+        self.assertNotIn("found", saved["reference"]["items"][2])
+        sys.path.insert(0, PIPE)
+        import features
+        block = features.embed(self.data, saved)
+        st = {f["id"]: (f["status"], f["count"]) for f in block["features"]}
+        self.assertEqual(st["feat.cart.lines"], ("built", 3))     # the endpoint, the module and its function
+        self.assertEqual(st["feat.cart.gift"][0], "partial")
+        self.assertEqual(st["feat.cart"][0], "partial")           # an area takes its features' statuses
+        self.assertEqual(st["feat.loyalty"][0], "docs")
+        self.assertEqual([i["state"] for i in block["reference"]["items"]], ["matched", "check", "not found", "out of scope"])
+
+    def test_errors(self):
+        bad = [
+            ("cites 'f:nowhere.py'", lambda d: d["features"][1]["boxes"].append("f:nowhere.py")),
+            ("names flow 'flow.none'", lambda d: d["features"][1]["flows"].append("flow.none")),
+            ("cites at least one box", lambda d: d["features"][2].pop("boxes")),
+            ("at most 3", lambda d: d["features"].append({"id": "feat.cart.gift.a.b", "parent": "feat.cart.gift.a", "name": "x", "summary": "x", "boxes": ["f:shop/gift.py"]}) or d["features"].append({"id": "feat.cart.gift.a", "parent": "feat.cart.gift", "name": "x", "summary": "x"})),
+            ("starts with \"feat.\"", lambda d: d["features"][3].update(id="loyalty")),
+            ("names the feature that covers it", lambda d: d["reference"]["items"][0].pop("feature")),
+            ("lists the terms searched for", lambda d: d["reference"]["items"][2].pop("searched")),
+            ("a name of 1 to 48", lambda d: d["features"][0].update(name="x" * 49)),
+        ]
+        for msg, change in bad:
+            doc = json.loads(json.dumps(self.doc))
+            change(doc)
+            r = self.run_check(doc)
+            self.assertNotEqual(r.returncode, 0, msg)
+            self.assertIn(msg, r.stdout)
+
+    def test_unclaimed_entry_points_fail(self):
+        doc = json.loads(json.dumps(self.doc))
+        doc["features"][1]["entry"] = []
+        doc["features"][1]["boxes"] = ["f:shop/gift.py"]
+        doc["features"][1]["flows"] = []
+        r = self.run_check(doc)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("unclaimed: ep:shop POST /cart", r.stdout)
+        self.assertIn("unclaimed: flow.add", r.stdout)
+
+    def test_brief_lists_the_map_and_the_reference(self):
+        ref = Path(self.tmp.name, "roadmap.md")
+        ref.write_text("# Roadmap\n- Saved carts\n- [ ] Wishlists\n1. Gift cards\n")
+        r = tool("features.py", "brief", self.m, "--reference", str(ref))
+        self.assertEqual(r.returncode, 0, r.stderr)
+        for want in ("- Saved carts", "- Wishlists", "- Gift cards", "ep:shop POST /cart", "flow.add: Add a line",
+                     "f:shop/gift.py (module) Gift cards [partial]", "[docs only]"):
+            self.assertIn(want, r.stdout)
+        self.assertNotIn("add_line()", r.stdout.split("## The map")[1])   # symbols are left out
+
+
 if __name__ == "__main__":
     unittest.main()

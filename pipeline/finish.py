@@ -15,9 +15,11 @@ Then it runs, in order, and prints each one's report:
   symcheck.py   cited lines against their symbols (98% or more passes)
   depthcheck.py how deep the map goes: public definitions with a box, symbol boxes with a
                 connection and code excerpts, each with a floor
+  features.py   the feature tree, when the map has a features.json (rebuilds the page when the
+                check updates the reference list's search results)
   analyze.py    ANALYSIS.md and BUILDOUT.md (skip with --no-analyze)
 
-It exits 1 if validation, the build, the symbol check or the depth check fails, and prints a one-line summary last.
+It exits 1 if validation, the build, the symbol check, the depth check or the feature check fails, and prints a one-line summary last.
 Run it again after each round of edits in parts/ or flows.json.
 """
 import argparse
@@ -117,6 +119,14 @@ def main():
     print("\n== depthcheck")
     deep_enough, depth = depthcheck.report(m, repo)
     covered, total = depth["covered"], depth["total"]
+    features_ok = True
+    if os.path.exists(os.path.join(m, "features.json")):
+        print("\n== features")
+        sys.path.insert(0, HERE)
+        import features
+        features_ok, changed = features.check(m, repo)
+        if changed:
+            run("build.py", m)
     if not a.no_analyze:
         run("analyze.py", m)
     unresolved = re.search(r"unresolved by family: (.*)", refs)
@@ -131,6 +141,9 @@ def main():
     if not deep_enough:
         print("finish: the map is shallower than the depth check allows (see == depthcheck above); send the "
               "agent of each listed file's area back with that list, to box, connect and quote what it lists")
+        failed = True
+    if not features_ok:
+        print("finish: the feature tree has errors or leaves entry points unclaimed (see == features above)")
         failed = True
     if failed:
         sys.exit(1)

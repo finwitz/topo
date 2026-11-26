@@ -300,6 +300,58 @@ button.tag:hover, button.tag[aria-pressed="true"] { border-color: var(--accent);
   .search-btn { min-width: 0; }
   .search-btn kbd, .btn .lbl-wide { display: none; }
 }
+/* ---------- features view: the product's features as a tree, over the map ---------- */
+.fview { position: absolute; inset: 0; z-index: 6; overflow: auto; background: var(--paper); padding: 22px max(28px, env(safe-area-inset-right, 0px)) 48px max(28px, env(safe-area-inset-left, 0px)); }
+.fv-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 8px; }
+.fv-head h2 { margin: 0; font: 700 22px/1.1 var(--font-label); color: var(--ink); }
+.fv-stats { flex: 1; min-width: 0; margin: 0; color: var(--ink-2); font-size: 13px; }
+.fv-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0 0 18px; font-size: 12px; color: var(--ink-3); }
+.fv-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.fv-mark { --c: var(--ink-2); flex: none; display: inline-block; width: 10px; height: 10px; border-radius: 50%; box-sizing: border-box; }
+.fv-mark.st-built { background: var(--c); }
+.fv-mark.st-partial { border: 1.5px solid var(--c); background: linear-gradient(90deg, transparent 50%, var(--c) 50%); }
+.fv-mark.st-docs { border: 1.5px dotted var(--c); }
+.fv-mark.st-notfound { border: 1.5px dashed var(--c); }
+.fv-mark.st-check { border: 1.5px dashed var(--warn); background: radial-gradient(circle, var(--warn) 30%, transparent 34%); }
+.fv-tree { position: relative; }
+.fv-lines { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.fv-lines path { fill: none; stroke-width: 1.6; }
+.fv-rows { position: relative; display: grid; grid-template-columns: max-content minmax(120px, 210px) minmax(0, 1fr); column-gap: 72px; row-gap: 22px; align-items: center; }
+.fv-root { grid-column: 1; align-self: center; font: 700 17px/1.2 var(--font-label); color: var(--ink); max-width: 180px; }
+.fv-area { grid-column: 2; justify-self: end; display: flex; align-items: center; gap: 8px; border: 0; background: none; padding: 4px 0; cursor: pointer; text-align: right; font: 600 14px/1.25 var(--font-body); color: var(--ink); }
+.fv-area .fv-chev { color: var(--ink-3); font-size: 11px; transition: transform .15s; }
+.fv-area[aria-expanded="false"] .fv-chev { transform: rotate(-90deg); }
+.fv-area .fv-n { font-weight: 500; }
+.fv-area:hover .fv-name, .fv-leaf:hover b { text-decoration: underline; text-underline-offset: 3px; }
+.fv-list { grid-column: 3; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fv-list ul { list-style: none; margin: 0 0 4px 22px; padding: 0 0 0 10px; border-left: 1px solid var(--rule); }
+.fv-leaf { --c: var(--ink-2); display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 2px 10px; align-items: baseline; width: 100%; border: 0; border-bottom: 1.5px solid var(--c); background: none; padding: 5px 2px 5px 0; cursor: pointer; text-align: left; color: var(--ink); }
+.fv-leaf.is-gap { border-bottom-style: dashed; }
+.fv-leaf:focus-visible, .fv-area:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.fv-leaf .fv-mark { align-self: center; }
+.fv-leaf b { font-weight: 600; }
+.fv-leaf .fv-sum { color: var(--ink-2); font-weight: 400; overflow-wrap: anywhere; }
+.fv-leaf > span { min-width: 0; }
+.fv-leaf .fv-n, .fv-area .fv-n { font: 500 12px/1 var(--font-mono); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.fv-leaf.is-flash { background: var(--accent-soft); }
+.fv-ref { margin-top: 36px; max-width: 980px; }
+.fv-ref h3 { margin: 0 0 4px; font: 700 16px/1.2 var(--font-label); }
+.fv-ref p { margin: 0 0 10px; color: var(--ink-2); font-size: 13px; }
+.fv-ref ul { list-style: none; margin: 0; padding: 0; columns: 2 320px; column-gap: 32px; }
+.fv-ref li { break-inside: avoid; display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 2px 10px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--rule); font-size: 13px; }
+.fv-ref li .fv-mark { align-self: center; }
+.fv-ref li small { grid-column: 2; color: var(--ink-3); font-size: 12px; overflow-wrap: anywhere; }
+.fv-ref li button { border: 0; background: none; padding: 0; cursor: pointer; color: var(--accent); font: inherit; text-align: left; }
+#app:has(#fview:not([hidden])) #btn-export { visibility: hidden; }
+
+@media (max-width: 720px) {
+  .fview { padding: 16px 16px 40px; }
+  .fv-rows { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+  .fv-root { display: none; }
+  .fv-area { align-self: flex-start; text-align: left; margin-top: 12px; flex-direction: row-reverse; }
+  .fv-list { padding-left: 12px; border-left: 2px solid var(--c, var(--rule)); }
+  .fv-lines { display: none; }
+}
 @media (max-width: 720px) {
   .crumbs, .stats, #btn-bounds, #btn-export { display: none; }
   .dock { top: auto; bottom: 0; left: 0; width: 100%; height: 58%; border-radius: 14px 14px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -336,6 +388,9 @@ button.tag:hover, button.tag[aria-pressed="true"] { border-color: var(--accent);
       <button class="btn" id="btn-flows" type="button" aria-pressed="false">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="4" cy="15" r="2"/><circle cx="16" cy="5" r="2"/><path d="M6 15h4.5a3 3 0 0 0 0-6h-1a3 3 0 0 1 0-6H14" stroke-dasharray="2.5 2.5"/></svg><span class="lbl-wide">Flows</span>
       </button>
+      <button class="btn" id="btn-features" type="button" aria-pressed="false" hidden title="What the product does, feature by feature, and its gaps">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="3.5" cy="10" r="1.6"/><path d="M5 10c4 0 3-6 7-6h5M5 10h12M5 10c4 0 3 6 7 6h5"/></svg><span class="lbl-wide">Features</span>
+      </button>
       <button class="btn" id="btn-insights" type="button" aria-pressed="false">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 16V9M10 16V4M16 16v-5"/></svg><span class="lbl-wide">Insights</span>
       </button>
@@ -356,6 +411,21 @@ button.tag:hover, button.tag[aria-pressed="true"] { border-color: var(--accent);
 
   <main class="stage" id="stage">
     <canvas id="map" aria-label="Zoomable map of the applications. Scroll or pinch to zoom, drag to pan, click a box for details." role="img"></canvas>
+
+    <section class="fview" id="fview" hidden aria-labelledby="fv-title">
+      <div class="fv-head">
+        <h2 id="fv-title">Features</h2>
+        <p class="fv-stats" id="fv-stats"></p>
+        <button class="btn" id="fv-gaps" type="button" aria-pressed="false">Gaps only</button>
+      </div>
+      <div class="fv-legend" aria-label="Key">
+        <span><i class="fv-mark st-built"></i>built</span><span><i class="fv-mark st-partial"></i>partial, a stub or planned</span>
+        <span><i class="fv-mark st-docs"></i>documents only</span><span><i class="fv-mark st-notfound"></i>not found in the code</span>
+        <span><i class="fv-mark st-check"></i>to check by hand</span><span class="fv-key-n">12 = boxes on the map</span>
+      </div>
+      <div class="fv-tree" id="fv-tree"><svg class="fv-lines" id="fv-lines" aria-hidden="true"></svg><div class="fv-rows" id="fv-rows"></div></div>
+      <section class="fv-ref" id="fv-ref" hidden></section>
+    </section>
 
     <div class="float rail" id="rail" aria-label="Zoom level">
       <div class="rail-title">Level</div>
@@ -2573,6 +2643,7 @@ function setCap(c, opts = {}) {
     capLit = new Set(); capCount = new Map();
     for (const n of capHit) for (const x of pathOf(n)) { capLit.add(x); if (x !== n) capCount.set(x, (capCount.get(x) || 0) + 1); }
     const per = CAP_BY_ENG.get(capFocus) || new Map();
+    $('#capbar .lbl').textContent = 'Capability';
     $('#cap-name').textContent = capFocus;
     $('#cap-counts').textContent = ENGS.length ? ENGS.map(e => `${shortName(e)} ${per.get(e) || 'none'}`).join(' · ') : `${capHit.size} boxes`;
     $('#capbar').hidden = false;
@@ -2583,6 +2654,144 @@ function setCap(c, opts = {}) {
   return capHit ? capHit.size : 0;
 }
 $('#cap-close').addEventListener('click', () => setCap(null));
+
+// ============================================================ features view
+// features.json, embedded by build.py: a tree of what the product does, each feature citing its boxes,
+// with a status worked out from them, and the reference list's items (matched, not found, to check)
+const FEATS = Array.isArray(DATA.features) ? DATA.features : [];
+const REF = DATA.reference && Array.isArray(DATA.reference.items) ? DATA.reference : null;
+const fviewEl = $('#fview');
+const FKIDS = new Map(), FBY = new Map(FEATS.map(f => [f.id, f]));
+for (const f of FEATS) { const k = f.parent || ''; if (!FKIDS.has(k)) FKIDS.set(k, []); FKIDS.get(k).push(f); }
+const FAREAS = FKIDS.get('') || [];
+const F_HUES = [262, 189, 38, 152, 8, 222, 300, 96, 340, 172, 56, 205];
+const fColor = i => `hsl(${F_HUES[i % F_HUES.length]} 46% var(--sys-l))`;
+let fGaps = false, fFolded = new Set();
+const isGap = f => f.status === 'partial' || f.status === 'docs';
+function fBoxes(f) {   // the boxes a feature cites, and its sub-features'
+  const out = [];
+  for (const id of [...(f.entry || []), ...(f.boxes || [])]) { const n = byId.get(id); if (n) out.push(n); }
+  for (const k of FKIDS.get(f.id) || []) out.push(...fBoxes(k));
+  return out;
+}
+function fKeep(f) { return !fGaps || isGap(f) || (FKIDS.get(f.id) || []).some(fKeep); }
+function fLeafHtml(f, color) {
+  const kids = (FKIDS.get(f.id) || []).filter(fKeep);
+  const st = f.status === 'docs' ? 'docs' : f.status;
+  return `<li><button class="fv-leaf${isGap(f) ? ' is-gap' : ''}" type="button" data-feat="${esc(f.id)}" style="--c:${color}" title="Show its boxes on the map">
+    <i class="fv-mark st-${st}" style="--c:${color}"></i><span><b>${esc(f.name)}</b><span class="fv-sum">: ${esc(f.summary || '')}</span></span><span class="fv-n">${f.count || 0}</span></button>${
+    kids.length ? `<ul>${kids.map(k => fLeafHtml(k, color)).join('')}</ul>` : ''}</li>`;
+}
+function fGapItems() { return REF ? REF.items.filter(i => i.state === 'not found' || i.state === 'check') : []; }
+function renderFeatures() {
+  const rows = $('#fv-rows');
+  const areas = FAREAS.map((a, i) => [a, fColor(i)]).filter(([a]) => fKeep(a));
+  const gapItems = fGapItems();
+  let h = `<div class="fv-root" style="grid-row:1 / span ${Math.max(1, areas.length + (gapItems.length ? 1 : 0))}" data-anchor="root">${esc(META.title || 'This product')}</div>`;
+  areas.forEach(([a, color], i) => {
+    const open = !fFolded.has(a.id), kids = (FKIDS.get(a.id) || []).filter(fKeep);
+    const row = `grid-row:${i + 1}`;
+    h += `<button class="fv-area" type="button" style="${row};--c:${color}" data-area="${esc(a.id)}" aria-expanded="${open}" title="${esc(a.summary || '')}">
+      <span class="fv-n">${a.count || 0}</span><span class="fv-name">${esc(a.name)}</span><span class="fv-chev" aria-hidden="true">▾</span></button>`;
+    h += `<ul class="fv-list" style="${row};--c:${color}" data-of="${esc(a.id)}">${open ? (kids.length ? kids : [a]).map(k => fLeafHtml(k, color)).join('') : ''}</ul>`;
+  });
+  if (gapItems.length) {
+    const row = `grid-row:${areas.length + 1}`, color = 'var(--ink-3)';
+    h += `<div class="fv-area" style="${row};--c:${color};cursor:default" data-area="ref"><span class="fv-name">Not found: ${esc(REF.name)}</span></div>`;
+    h += `<ul class="fv-list" style="${row};--c:${color}" data-of="ref">${gapItems.map(it => `<li><div class="fv-leaf is-gap" style="--c:${color};cursor:default">
+      <i class="fv-mark st-${it.state === 'check' ? 'check' : 'notfound'}" style="--c:${color}"></i><span><b>${esc(it.text)}</b><span class="fv-sum">: ${
+      it.state === 'check' ? `the search found ${esc((it.found || []).join(', '))}; check by hand` : `searched for ${esc((it.searched || []).join(', '))}`}</span></span><span class="fv-n"></span></div></li>`).join('')}</ul>`;
+  }
+  rows.innerHTML = h;
+  const leaves = FEATS.filter(f => !(FKIDS.get(f.id) || []).length);
+  const n = s => leaves.filter(f => f.status === s).length;
+  let stats = `${FAREAS.length} areas, ${leaves.length} features: ${n('built')} built, ${n('partial')} partial, ${n('docs')} documents only`;
+  if (REF) {
+    const c = s => REF.items.filter(i => i.state === s).length;
+    stats += `. ${REF.name}: ${c('matched')} matched, ${c('not found')} not found, ${c('check')} to check by hand${c('out of scope') ? `, ${c('out of scope')} out of scope` : ''}`;
+  }
+  $('#fv-stats').textContent = stats + '.';
+  renderRef();
+  requestAnimationFrame(drawFeatureLines);
+}
+function renderRef() {
+  const el = $('#fv-ref');
+  if (!REF) { el.hidden = true; return; }
+  const label = { matched: 'matched', 'not found': 'not found', check: 'to check by hand', 'out of scope': 'out of scope' };
+  const mark = { matched: 'built', 'not found': 'notfound', check: 'check', 'out of scope': 'docs' };
+  el.innerHTML = `<h3>${esc(REF.name)}</h3><p>Each item on the list, and the feature that covers it. "Not found" means the terms shown are nowhere in the code or on the map.</p><ul>${
+    REF.items.map(it => { const f = it.feature && FBY.get(it.feature);
+      return `<li><i class="fv-mark st-${mark[it.state] || 'docs'}"></i><span>${esc(it.text)}</span><small>${esc(label[it.state] || it.state)}${
+        f ? `: <button type="button" data-goto="${esc(f.id)}">${esc(f.name)}</button>` : ''}${it.state === 'not found' && it.searched ? `; searched for ${esc(it.searched.join(', '))}` : ''}${
+        it.state === 'check' && it.found ? `; found ${esc(it.found.join(', '))}` : ''}</small></li>`; }).join('')}</ul>`;
+  el.hidden = false;
+}
+function drawFeatureLines() {
+  const svg = $('#fv-lines'), tree = $('#fv-tree');
+  if (fviewEl.hidden || getComputedStyle(svg).display === 'none') return;
+  const box = tree.getBoundingClientRect();
+  svg.setAttribute('width', tree.scrollWidth); svg.setAttribute('height', tree.scrollHeight);
+  const at = (el, side) => { const r = el.getBoundingClientRect(); return [(side === 'r' ? r.right : r.left) - box.left, r.top + r.height / 2 - box.top]; };
+  const curve = ([x0, y0], [x1, y1]) => { const m = (x0 + x1) / 2; return `M${x0} ${y0}C${m} ${y0} ${m} ${y1} ${x1} ${y1}`; };
+  const root = tree.querySelector('[data-anchor="root"]');
+  let h = '';
+  const r0 = at(root, 'r'); r0[0] += 10;
+  for (const area of tree.querySelectorAll('.fv-area')) {
+    const c = area.style.getPropertyValue('--c'), dash = area.dataset.area === 'ref' ? ' stroke-dasharray="4 4"' : '';
+    const a0 = at(area, 'l'); a0[0] -= 10;
+    h += `<path d="${curve(r0, a0)}" stroke="${c}"${dash}/>`;
+    const list = tree.querySelector(`.fv-list[data-of="${CSS.escape(area.dataset.area)}"]`);
+    if (!list) continue;
+    const a1 = at(area, 'r'); a1[0] += 10;
+    for (const leaf of list.querySelectorAll(':scope > li > .fv-leaf')) {
+      const r = leaf.getBoundingClientRect();
+      h += `<path d="${curve(a1, [r.left - box.left - 4, r.bottom - box.top - 1])}" stroke="${c}"${dash}/>`;
+    }
+  }
+  svg.innerHTML = h;
+}
+function openFeatures(on) {
+  fviewEl.hidden = !on;
+  $('#btn-features').setAttribute('aria-pressed', String(on));
+  if (on) { closePops(); renderFeatures(); fviewEl.focus({ preventScroll: true }); }
+}
+function showFeature(f) {
+  const hits = new Set(fBoxes(f));
+  if (!hits.size) return;
+  openFeatures(false);
+  capFocus = f.name; capHit = hits; capLit = new Set(); capCount = new Map();
+  for (const n of capHit) for (const x of pathOf(n)) { capLit.add(x); if (x !== n) capCount.set(x, (capCount.get(x) || 0) + 1); }
+  $('#capbar .lbl').textContent = 'Feature';
+  $('#cap-name').textContent = f.name;
+  $('#cap-counts').textContent = `${capHit.size} ${capHit.size === 1 ? 'box' : 'boxes'}`;
+  $('#capbar').hidden = false;
+  // fly to the smallest box that holds them all
+  let lca = null;
+  for (const n of capHit) { if (!lca) { lca = n; continue; } const p = new Set(pathOf(n)); lca = pathOf(lca).filter(x => p.has(x)).pop() || null; if (!lca) break; }
+  if (lca) flyTo(lca); else go(homeTransform());
+  if (selected) renderPanel(selected);
+  requestRender();
+}
+if (FEATS.length) {
+  $('#btn-features').hidden = false;
+  fviewEl.tabIndex = -1;
+  $('#btn-features').addEventListener('click', () => openFeatures(fviewEl.hidden));
+  $('#fv-gaps').addEventListener('click', () => { fGaps = !fGaps; $('#fv-gaps').setAttribute('aria-pressed', String(fGaps)); renderFeatures(); });
+  fviewEl.addEventListener('click', ev => {
+    const b = ev.target.closest('button');
+    if (!b) return;
+    if (b.dataset.area) { fFolded.has(b.dataset.area) ? fFolded.delete(b.dataset.area) : fFolded.add(b.dataset.area); renderFeatures(); }
+    else if (b.dataset.feat) showFeature(FBY.get(b.dataset.feat));
+    else if (b.dataset.goto) {
+      const f = FBY.get(b.dataset.goto); let a = f; while (a && a.parent) a = FBY.get(a.parent);
+      if (a && fFolded.delete(a.id)) renderFeatures();
+      if (fGaps && !isGap(f)) { fGaps = false; $('#fv-gaps').setAttribute('aria-pressed', 'false'); renderFeatures(); }
+      const el = fviewEl.querySelector(`.fv-leaf[data-feat="${CSS.escape(f.id)}"]`);
+      if (el) { el.scrollIntoView({ block: 'center', behavior: REDUCED ? 'auto' : 'smooth' }); el.classList.add('is-flash'); setTimeout(() => el.classList.remove('is-flash'), 1600); el.focus({ preventScroll: true }); }
+    }
+  });
+  new ResizeObserver(() => requestAnimationFrame(drawFeatureLines)).observe(fviewEl);
+}
 $('#p-up').addEventListener('click', () => { if (selected && selected.p) { const p = selected.p; select(p); flyTo(p); } });
 
 // ============================================================ search
@@ -3065,6 +3274,7 @@ document.addEventListener('keydown', ev => {
   if ((ev.key === 'k' && (ev.metaKey || ev.ctrlKey)) || (ev.key === '/' && !typing)) { ev.preventDefault(); openSearch(); return; }
   if (typing) return;
   if (ev.key === 'Escape') {
+    if (!fviewEl.hidden && searchEl.hidden) return openFeatures(false);
     if (!searchEl.hidden || !flowsEl.hidden || !legendEl.hidden || !stackEl.hidden || !insightsEl.hidden) return closePops();
     if (flow) return endFlow();
     if (capFocus) return setCap(null);

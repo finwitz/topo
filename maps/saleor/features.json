@@ -1,0 +1,953 @@
+{
+ "features": [
+  {
+   "id": "feat.catalog",
+   "name": "Catalog",
+   "summary": "Manage products, variants, categories, collections, attributes, media, pages and navigation menus."
+  },
+  {
+   "id": "feat.catalog.products",
+   "parent": "feat.catalog",
+   "name": "Products and variants",
+   "summary": "Create and manage products with variants, pricing per channel, attributes and channel availability.",
+   "entry": [
+    "f:saleor/saleor/graphql/product/mutations/product/product_create.py#ProductCreate",
+    "f:saleor/saleor/graphql/product/mutations/product/product_update.py#ProductUpdate",
+    "f:saleor/saleor/graphql/product/mutations/product/product_delete.py#ProductDelete",
+    "f:saleor/saleor/graphql/product/mutations/product_variant/product_variant_create.py#ProductVariantCreate",
+    "f:saleor/saleor/graphql/product/mutations/product_variant/product_variant_update.py#ProductVariantUpdate",
+    "f:saleor-dashboard/src/products/views/ProductList/ProductList.tsx",
+    "f:saleor-dashboard/src/products/views/ProductUpdate/ProductUpdate.tsx"
+   ],
+   "boxes": [
+    "core.cat.products",
+    "dash.cat.products"
+   ],
+   "flows": [
+    "flow.core-catalog.product-publish",
+    "flow.dash-catalog.product-to-channel"
+   ]
+  },
+  {
+   "id": "feat.catalog.attributes",
+   "parent": "feat.catalog",
+   "name": "Attributes",
+   "summary": "Define typed attributes that describe products, variants, pages and customers.",
+   "entry": [
+    "f:saleor/saleor/graphql/attribute/mutations/attribute_create.py#AttributeCreate",
+    "f:saleor/saleor/graphql/attribute/mutations/attribute_update.py#AttributeUpdate",
+    "f:saleor-dashboard/src/attributes/views/AttributeList/AttributeList.tsx",
+    "f:saleor-dashboard/src/attributes/views/AttributeCreate/AttributeCreate.tsx",
+    "f:saleor-dashboard/src/attributes/views/AttributeDetails/AttributeDetails.tsx"
+   ],
+   "boxes": [
+    "core.cat.attributes",
+    "dash.cat.attributes"
+   ]
+  },
+  {
+   "id": "feat.catalog.categories",
+   "parent": "feat.catalog",
+   "name": "Categories",
+   "summary": "Organize products into a tree of categories with descriptions and background images.",
+   "entry": [
+    "f:saleor/saleor/graphql/product/mutations/category/category_update.py#CategoryUpdate",
+    "f:saleor/saleor/graphql/product/mutations/category/category_delete.py#CategoryDelete",
+    "f:saleor-dashboard/src/categories/views/CategoryList/CategoryList.tsx",
+    "f:saleor-dashboard/src/categories/views/CategoryDetails.tsx"
+   ],
+   "boxes": [
+    "dash.cat.categories",
+    "d:saleor/saleor/graphql/product/mutations/category"
+   ]
+  },
+  {
+   "id": "feat.catalog.collections",
+   "parent": "feat.catalog",
+   "name": "Collections",
+   "summary": "Create hand-curated groups of products with channel availability and background images.",
+   "entry": [
+    "f:saleor/saleor/graphql/product/mutations/collection/collection_create.py#CollectionCreate",
+    "f:saleor/saleor/graphql/product/mutations/collection/collection_add_products.py#CollectionAddProducts",
+    "f:saleor-dashboard/src/collections/views/CollectionList/CollectionList.tsx",
+    "f:saleor-dashboard/src/collections/views/CollectionDetails.tsx"
+   ],
+   "boxes": [
+    "dash.cat.collections",
+    "d:saleor/saleor/graphql/product/mutations/collection"
+   ]
+  },
+  {
+   "id": "feat.catalog.product-types",
+   "parent": "feat.catalog",
+   "name": "Product types",
+   "summary": "Define product templates that set shared attributes, shipping requirements and tax class.",
+   "entry": [
+    "f:saleor/saleor/graphql/product/mutations/product_type/product_type_update.py#ProductTypeUpdate",
+    "f:saleor-dashboard/src/productTypes/views/ProductTypeList/ProductTypeList.tsx",
+    "f:saleor-dashboard/src/productTypes/views/ProductTypeUpdate/index.tsx"
+   ],
+   "boxes": [
+    "dash.cat.producttypes",
+    "d:saleor/saleor/graphql/product/mutations/product_type"
+   ]
+  },
+  {
+   "id": "feat.catalog.media",
+   "parent": "feat.catalog",
+   "name": "Product media",
+   "summary": "Upload product images and external video media served as responsive thumbnails.",
+   "entry": [
+    "f:saleor/saleor/graphql/product/mutations/product/product_media_create.py#ProductMediaCreate",
+    "ep:api GET /thumbnail/{instance_id}/{size}/{format}/",
+    "ep:api GET /image/{instance_id}/",
+    "f:saleor-dashboard/src/products/views/ProductImage.tsx"
+   ],
+   "boxes": [
+    "core.cat.media"
+   ]
+  },
+  {
+   "id": "feat.catalog.content",
+   "parent": "feat.catalog",
+   "name": "Pages and menus",
+   "summary": "Create typed content pages with attributes and build navigation menus linking to categories and pages.",
+   "entry": [
+    "f:saleor/saleor/graphql/page/mutations/page_create.py#PageCreate",
+    "f:saleor/saleor/graphql/menu/mutations/assign_navigation.py#AssignNavigation",
+    "f:saleor/saleor/graphql/menu/mutations/menu_item_move.py#MenuItemMove",
+    "f:saleor-dashboard/src/modeling/views/PageList/PageList.tsx",
+    "f:saleor-dashboard/src/modeling/views/PageCreate.tsx",
+    "f:saleor-dashboard/src/structures/views/MenuList/MenuList.tsx",
+    "f:saleor-dashboard/src/structures/views/MenuDetails/index.tsx"
+   ],
+   "boxes": [
+    "core.cat.content",
+    "dash.cat.models",
+    "dash.cat.menus"
+   ]
+  },
+  {
+   "id": "feat.catalog.translations",
+   "parent": "feat.catalog",
+   "name": "Translations",
+   "summary": "Translate products, categories, collections, attributes, pages and menus into multiple languages.",
+   "entry": [
+    "f:saleor/saleor/graphql/translations/mutations/product_translate.py#ProductTranslate",
+    "f:saleor/saleor/graphql/translations/mutations/category_translate.py#CategoryTranslate",
+    "f:saleor/saleor/graphql/translations/mutations/voucher_translate.py#VoucherTranslate",
+    "f:saleor-dashboard/src/translations/views/TranslationsLanguageList.tsx",
+    "f:saleor-dashboard/src/translations/views/TranslationsProducts.tsx"
+   ],
+   "boxes": [
+    "core.api.translations",
+    "dash.cat.translations"
+   ]
+  },
+  {
+   "id": "feat.catalog.export",
+   "parent": "feat.catalog",
+   "name": "Product export",
+   "summary": "Export the product catalog to a CSV or Excel file stored in object storage.",
+   "entry": [
+    "f:saleor/saleor/graphql/csv/mutations/export_products.py#ExportProducts"
+   ],
+   "boxes": [
+    "core.cat.export"
+   ],
+   "flows": [
+    "flow.core-catalog.csv-export"
+   ]
+  },
+  {
+   "id": "feat.checkout",
+   "name": "Checkout",
+   "summary": "Let shoppers build a cart, pick a delivery method, pay and complete their order."
+  },
+  {
+   "id": "feat.checkout.cart",
+   "parent": "feat.checkout",
+   "name": "Shopping cart",
+   "summary": "Create and modify a cart with product variants, quantities, promo codes and customer details.",
+   "entry": [
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_create.py#CheckoutCreate",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_lines_add.py#CheckoutLinesAdd",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_lines_update.py#CheckoutLinesUpdate",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_lines_delete.py#CheckoutLinesDelete",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_add_promo_code.py#CheckoutAddPromoCode",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_remove_promo_code.py#CheckoutRemovePromoCode",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_customer_attach.py#CheckoutCustomerAttach",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_email_update.py#CheckoutEmailUpdate"
+   ],
+   "boxes": [
+    "core.co.cart"
+   ]
+  },
+  {
+   "id": "feat.checkout.delivery",
+   "parent": "feat.checkout",
+   "name": "Delivery options",
+   "summary": "Set shipping and billing addresses, choose a delivery method and recalculate prices and taxes.",
+   "entry": [
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_shipping_address_update.py#CheckoutShippingAddressUpdate",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_billing_address_update.py#CheckoutBillingAddressUpdate",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_delivery_method_update.py#CheckoutDeliveryMethodUpdate"
+   ],
+   "boxes": [
+    "core.co.delivery",
+    "core.co.pricing"
+   ],
+   "flows": [
+    "flow.core-checkout.tax-recalc"
+   ]
+  },
+  {
+   "id": "feat.checkout.payment",
+   "parent": "feat.checkout",
+   "name": "Payment at checkout",
+   "summary": "Authorize and charge payments through a connected payment gateway app during checkout.",
+   "entry": [
+    "f:saleor/saleor/graphql/payment/mutations/transaction/payment_gateway_initialize.py#PaymentGatewayInitialize",
+    "f:saleor/saleor/graphql/payment/mutations/transaction/transaction_initialize.py#TransactionInitialize",
+    "f:saleor/saleor/graphql/payment/mutations/transaction/transaction_process.py#TransactionProcess",
+    "f:saleor/saleor/graphql/payment/mutations/payment/checkout_payment_create.py#CheckoutPaymentCreate"
+   ],
+   "boxes": [
+    "core.co.pay"
+   ],
+   "flows": [
+    "flow.core-checkout.transaction-payment",
+    "flow.apps-stripe.shopper-pays"
+   ]
+  },
+  {
+   "id": "feat.checkout.complete",
+   "parent": "feat.checkout",
+   "name": "Checkout completion",
+   "summary": "Validate and lock a paid checkout, allocate stock and convert it into an order.",
+   "entry": [
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_complete.py#CheckoutComplete",
+    "f:saleor/saleor/graphql/checkout/mutations/order_create_from_checkout.py#OrderCreateFromCheckout",
+    "f:saleor/saleor/graphql/checkout/mutations/checkout_create_from_order.py#CheckoutCreateFromOrder"
+   ],
+   "boxes": [
+    "core.co.complete"
+   ],
+   "flows": [
+    "flow.core-checkout.complete-to-order"
+   ]
+  },
+  {
+   "id": "feat.payments",
+   "name": "Payments",
+   "summary": "Process, track and act on payments through Stripe, gift cards and manual transactions."
+  },
+  {
+   "id": "feat.payments.stripe",
+   "parent": "feat.payments",
+   "name": "Stripe payment gateway",
+   "summary": "Connect Stripe accounts to channels and process payments, charges and refunds via Stripe.",
+   "entry": [
+    "ep:stripe GET /api/manifest",
+    "ep:stripe POST /api/register",
+    "ep:stripe POST /api/trpc/{trpc}",
+    "ep:stripe GET /api/cron/cleanup-stale-installations",
+    "ep:stripe POST /api/webhooks/saleor/transaction-initialize-session",
+    "ep:stripe POST /api/webhooks/saleor/payment-gateway-initialize-session",
+    "ep:stripe POST /api/webhooks/saleor/transaction-process-session",
+    "ep:stripe POST /api/webhooks/saleor/transaction-charge-requested",
+    "ep:stripe POST /api/webhooks/saleor/transaction-refund-requested",
+    "ep:stripe POST /api/webhooks/saleor/transaction-cancelation-requested",
+    "ep:stripe POST /api/webhooks/saleor/order-created",
+    "ep:stripe POST /api/webhooks/stripe"
+   ],
+   "boxes": [
+    "apps.stripe"
+   ],
+   "flows": [
+    "flow.apps-stripe.shopper-pays",
+    "flow.apps-stripe.refund",
+    "flow.apps-stripe.configure"
+   ]
+  },
+  {
+   "id": "feat.payments.gift-cards",
+   "parent": "feat.payments",
+   "name": "Gift cards",
+   "summary": "Issue, activate, assign and redeem gift cards with balances and expiry dates.",
+   "entry": [
+    "f:saleor/saleor/graphql/giftcard/mutations/gift_card_create.py#GiftCardCreate",
+    "f:saleor/saleor/graphql/giftcard/mutations/gift_card_update.py#GiftCardUpdate",
+    "f:saleor/saleor/graphql/giftcard/mutations/gift_card_activate.py#GiftCardActivate",
+    "f:saleor/saleor/graphql/giftcard/mutations/gift_card_deactivate.py#GiftCardDeactivate",
+    "f:saleor/saleor/graphql/giftcard/mutations/gift_card_resend.py#GiftCardResend",
+    "f:saleor/saleor/graphql/giftcard/mutations/gift_card_balance_adjust.py#GiftCardBalanceAdjust",
+    "f:saleor-dashboard/src/giftCards/GiftCardsList/GiftCardsList.tsx"
+   ],
+   "boxes": [
+    "core.co.gift",
+    "dash.ord.giftcards"
+   ]
+  },
+  {
+   "id": "feat.payments.transactions",
+   "parent": "feat.payments",
+   "name": "Transaction management",
+   "summary": "Track and act on individual payment transactions including charges, cancellations and refunds.",
+   "entry": [
+    "f:saleor/saleor/graphql/payment/mutations/transaction/transaction_event_report.py#TransactionEventReport",
+    "f:saleor/saleor/graphql/payment/mutations/transaction/transaction_create.py#TransactionCreate",
+    "f:saleor/saleor/graphql/payment/mutations/transaction/transaction_update.py#TransactionUpdate",
+    "f:saleor/saleor/graphql/payment/mutations/transaction/transaction_request_action.py#TransactionRequestAction",
+    "f:saleor/saleor/graphql/payment/mutations/transaction/transaction_request_refund_for_granted_refund.py#TransactionRequestRefundForGrantedRefund"
+   ],
+   "boxes": [
+    "core.co.pay.api"
+   ]
+  },
+  {
+   "id": "feat.orders",
+   "name": "Orders",
+   "summary": "Manage the full order lifecycle from draft creation through fulfilment, returns and invoices."
+  },
+  {
+   "id": "feat.orders.management",
+   "parent": "feat.orders",
+   "name": "Order management",
+   "summary": "View, search and manage placed orders with status updates, notes, addresses and customer info.",
+   "entry": [
+    "f:saleor/saleor/graphql/order/mutations/order_confirm.py#OrderConfirm",
+    "f:saleor/saleor/graphql/order/mutations/order_cancel.py#OrderCancel",
+    "f:saleor/saleor/graphql/order/mutations/order_note_add.py#OrderNoteAdd",
+    "f:saleor/saleor/graphql/order/mutations/order_update.py#OrderUpdate",
+    "f:saleor-dashboard/src/orders/views/OrderList/OrderList.tsx",
+    "f:saleor-dashboard/src/orders/views/OrderDetails/OrderDetails.tsx"
+   ],
+   "boxes": [
+    "core.ord.orders",
+    "dash.ord.orders.list",
+    "dash.ord.orders.details"
+   ]
+  },
+  {
+   "id": "feat.orders.draft",
+   "parent": "feat.orders",
+   "name": "Draft orders",
+   "summary": "Build a draft order manually from products, discounts and shipping then convert it to a real order.",
+   "entry": [
+    "f:saleor/saleor/graphql/order/mutations/draft_order_create.py#DraftOrderCreate",
+    "f:saleor/saleor/graphql/order/mutations/draft_order_update.py#DraftOrderUpdate",
+    "f:saleor/saleor/graphql/order/mutations/draft_order_complete.py#DraftOrderComplete",
+    "f:saleor/saleor/graphql/order/mutations/draft_order_delete.py#DraftOrderDelete",
+    "f:saleor-dashboard/src/orders/views/OrderDraftList/OrderDraftList.tsx"
+   ],
+   "boxes": [
+    "core.ord.api.drafts",
+    "dash.ord.orders.drafts"
+   ],
+   "flows": [
+    "flow.core-orders.draft"
+   ]
+  },
+  {
+   "id": "feat.orders.fulfilment",
+   "parent": "feat.orders",
+   "name": "Order fulfilment",
+   "summary": "Fulfil order lines from warehouses, track shipments and optionally require approval.",
+   "entry": [
+    "f:saleor/saleor/graphql/order/mutations/order_fulfill.py#OrderFulfill",
+    "f:saleor/saleor/graphql/order/mutations/fulfillment_approve.py#FulfillmentApprove",
+    "f:saleor/saleor/graphql/order/mutations/fulfillment_cancel.py#FulfillmentCancel",
+    "f:saleor/saleor/graphql/order/mutations/fulfillment_update_tracking.py#FulfillmentUpdateTracking",
+    "f:saleor-dashboard/src/orders/views/OrderFulfill/OrderFulfill.tsx"
+   ],
+   "boxes": [
+    "core.ord.api.fulfil",
+    "dash.ord.orders.fulfil"
+   ],
+   "flows": [
+    "flow.core-orders.fulfil",
+    "flow.dash-orders.fulfil",
+    "flow.x.fulfil-to-email"
+   ]
+  },
+  {
+   "id": "feat.orders.returns",
+   "parent": "feat.orders",
+   "name": "Returns",
+   "summary": "Return or replace fulfilled items, with optional granted refunds and stock restocking.",
+   "entry": [
+    "f:saleor/saleor/graphql/order/mutations/fulfillment_return_products.py#FulfillmentReturnProducts",
+    "f:saleor-dashboard/src/orders/views/OrderReturn/OrderReturn.tsx"
+   ],
+   "boxes": [
+    "dash.ord.orders.returns"
+   ]
+  },
+  {
+   "id": "feat.orders.refunds",
+   "parent": "feat.orders",
+   "name": "Refunds",
+   "summary": "Grant and send refunds on order payments, including manual and transaction-based refunds.",
+   "entry": [
+    "f:saleor/saleor/graphql/order/mutations/order_grant_refund_create.py#OrderGrantRefundCreate",
+    "f:saleor/saleor/graphql/order/mutations/order_grant_refund_update.py#OrderGrantRefundUpdate",
+    "f:saleor/saleor/graphql/order/mutations/order_refund.py#OrderRefund",
+    "f:saleor-dashboard/src/orders/views/OrderTransactionRefundCreate/OrderTransactionRefundCreate.tsx",
+    "f:saleor-dashboard/src/orders/views/OrderSendRefund/OrderSendRefund.tsx"
+   ],
+   "boxes": [
+    "core.ord.api.payments",
+    "dash.ord.orders.refunds"
+   ],
+   "flows": [
+    "flow.core-orders.refund",
+    "flow.apps-stripe.refund",
+    "flow.dash-orders.refund"
+   ]
+  },
+  {
+   "id": "feat.orders.invoices",
+   "parent": "feat.orders",
+   "name": "Invoices",
+   "summary": "Request, create, update and send invoice documents for orders.",
+   "entry": [
+    "f:saleor/saleor/graphql/invoice/mutations/invoice_request.py#InvoiceRequest",
+    "f:saleor/saleor/graphql/invoice/mutations/invoice_create.py#InvoiceCreate",
+    "f:saleor/saleor/graphql/invoice/mutations/invoice_delete.py#InvoiceDelete",
+    "f:saleor/saleor/graphql/invoice/mutations/invoice_send_notification.py#InvoiceSendNotification"
+   ],
+   "boxes": [
+    "core.ord.invoice",
+    "core.ord.invoice.api"
+   ]
+  },
+  {
+   "id": "feat.orders.shipping",
+   "parent": "feat.orders",
+   "name": "Shipping zones and methods",
+   "summary": "Define shipping zones with country and channel scope and price or weight-based shipping methods.",
+   "entry": [
+    "f:saleor/saleor/graphql/shipping/mutations/shipping_zone_create.py#ShippingZoneCreate",
+    "f:saleor/saleor/graphql/shipping/mutations/shipping_zone_update.py#ShippingZoneUpdate",
+    "f:saleor/saleor/graphql/shipping/mutations/shipping_price_create.py#ShippingPriceCreate",
+    "f:saleor/saleor/graphql/shipping/mutations/shipping_price_update.py#ShippingPriceUpdate",
+    "f:saleor-dashboard/src/shipping/views/ShippingZonesList.tsx",
+    "f:saleor-dashboard/src/shipping/views/ShippingZoneDetails/index.tsx",
+    "f:saleor-dashboard/src/shipping/views/RateUpdate.tsx"
+   ],
+   "boxes": [
+    "core.ord.shipping",
+    "dash.cat.shipping"
+   ]
+  },
+  {
+   "id": "feat.orders.warehouses",
+   "parent": "feat.orders",
+   "name": "Warehouses and inventory",
+   "summary": "Manage warehouses with addresses and channels, track stock and fulfil orders from them.",
+   "entry": [
+    "f:saleor/saleor/graphql/warehouse/mutations/warehouse_create.py#WarehouseCreate",
+    "f:saleor/saleor/graphql/warehouse/mutations/warehouse_update.py#WarehouseUpdate",
+    "f:saleor/saleor/graphql/warehouse/mutations/warehouse_delete.py#WarehouseDelete",
+    "f:saleor-dashboard/src/warehouses/views/WarehouseList/WarehouseList.tsx",
+    "f:saleor-dashboard/src/warehouses/views/WarehouseDetails/WarehouseDetails.tsx"
+   ],
+   "boxes": [
+    "core.ord.stock",
+    "dash.cat.warehouses"
+   ]
+  },
+  {
+   "id": "feat.discounts",
+   "name": "Discounts",
+   "summary": "Apply automatic discounts through promotions and let shoppers use voucher codes at checkout."
+  },
+  {
+   "id": "feat.discounts.promotions",
+   "parent": "feat.discounts",
+   "name": "Promotions",
+   "summary": "Create catalogue and order promotions with rules and predicates that apply automatic discounts.",
+   "entry": [
+    "f:saleor/saleor/graphql/discount/mutations/promotion/promotion_create.py#PromotionCreate",
+    "f:saleor/saleor/graphql/discount/mutations/promotion/promotion_update.py#PromotionUpdate",
+    "f:saleor/saleor/graphql/discount/mutations/promotion/promotion_rule_create.py#PromotionRuleCreate",
+    "f:saleor/saleor/graphql/discount/mutations/promotion/promotion_rule_update.py#PromotionRuleUpdate",
+    "f:saleor-dashboard/src/discounts/views/DiscountCreate/DiscountCreate.tsx",
+    "f:saleor-dashboard/src/discounts/views/DiscountDetails/DiscountDetails.tsx"
+   ],
+   "boxes": [
+    "core.cat.discounts",
+    "dash.ord.discounts.promotions"
+   ],
+   "flows": [
+    "flow.core-catalog.promotion-prices",
+    "flow.dash-orders.promotion"
+   ]
+  },
+  {
+   "id": "feat.discounts.vouchers",
+   "parent": "feat.discounts",
+   "name": "Vouchers and codes",
+   "summary": "Create vouchers with discount codes that shoppers apply at checkout for price reductions.",
+   "entry": [
+    "f:saleor/saleor/graphql/discount/mutations/voucher/voucher_create.py#VoucherCreate",
+    "f:saleor/saleor/graphql/discount/mutations/voucher/voucher_channel_listing_update.py#VoucherChannelListingUpdate",
+    "f:saleor-dashboard/src/discounts/views/VoucherCreate/VoucherCreate.tsx",
+    "f:saleor-dashboard/src/discounts/views/VoucherDetails/VoucherDetails.tsx"
+   ],
+   "boxes": [
+    "dash.ord.discounts.vouchers",
+    "d:saleor/saleor/graphql/discount/mutations/voucher"
+   ]
+  },
+  {
+   "id": "feat.accounts",
+   "name": "Accounts",
+   "summary": "Manage shopper accounts, staff members, permission groups and authentication."
+  },
+  {
+   "id": "feat.accounts.customers",
+   "parent": "feat.accounts",
+   "name": "Customer accounts",
+   "summary": "Register and manage shopper accounts with addresses, attributes, notes and order history.",
+   "entry": [
+    "f:saleor/saleor/graphql/account/mutations/account/account_register.py#AccountRegister",
+    "f:saleor/saleor/graphql/account/mutations/account/confirm_account.py#ConfirmAccount",
+    "f:saleor/saleor/graphql/account/mutations/account/account_update.py#AccountUpdate",
+    "f:saleor/saleor/graphql/account/mutations/staff/customer_create.py#CustomerCreate",
+    "f:saleor/saleor/graphql/account/mutations/staff/customer_update.py#CustomerUpdate",
+    "f:saleor-dashboard/src/customers/views/CustomerList/CustomerList.tsx",
+    "f:saleor-dashboard/src/customers/views/CustomerDetails.tsx"
+   ],
+   "boxes": [
+    "core.acc.shopper",
+    "core.acc.staff",
+    "dash.ord.customers"
+   ],
+   "flows": [
+    "flow.core-accounts.shopper-register"
+   ]
+  },
+  {
+   "id": "feat.accounts.staff",
+   "parent": "feat.accounts",
+   "name": "Staff management",
+   "summary": "Invite and manage staff members with their active status and assigned permission groups.",
+   "entry": [
+    "f:saleor/saleor/graphql/account/mutations/staff/staff_create.py#StaffCreate",
+    "f:saleor/saleor/graphql/account/mutations/staff/staff_update.py#StaffUpdate",
+    "f:saleor/saleor/graphql/account/mutations/staff/staff_delete.py#StaffDelete",
+    "f:saleor-dashboard/src/staff/views/StaffList/StaffList.tsx",
+    "f:saleor-dashboard/src/staff/views/StaffDetails.tsx"
+   ],
+   "boxes": [
+    "core.acc.domain",
+    "dash.cat.staff"
+   ]
+  },
+  {
+   "id": "feat.accounts.permissions",
+   "parent": "feat.accounts",
+   "name": "Roles and permissions",
+   "summary": "Create and manage permission groups that restrict what staff members can see and do.",
+   "entry": [
+    "f:saleor/saleor/graphql/account/mutations/permission_group/permission_group_create.py#PermissionGroupCreate",
+    "f:saleor/saleor/graphql/account/mutations/permission_group/permission_group_update.py#PermissionGroupUpdate",
+    "f:saleor/saleor/graphql/account/mutations/permission_group/permission_group_delete.py#PermissionGroupDelete",
+    "f:saleor-dashboard/src/permissionGroups/views/PermissionGroupList/PermissionGroupList.tsx",
+    "f:saleor-dashboard/src/permissionGroups/views/PermissionGroupCreate/PermissionGroupCreate.tsx"
+   ],
+   "boxes": [
+    "core.acc.perms",
+    "dash.cat.permissions"
+   ]
+  },
+  {
+   "id": "feat.accounts.auth",
+   "parent": "feat.accounts",
+   "name": "Sign-in and authentication",
+   "summary": "Sign in with email and password or an OpenID Connect provider to access the API or dashboard.",
+   "entry": [
+    "f:saleor/saleor/graphql/account/mutations/authentication/create_token.py#CreateToken",
+    "f:saleor/saleor/graphql/account/mutations/authentication/refresh_token.py#RefreshToken",
+    "f:saleor/saleor/graphql/account/mutations/authentication/external_obtain_access_tokens.py#ExternalObtainAccessTokens",
+    "f:saleor/saleor/graphql/account/mutations/authentication/request_password_reset.py#RequestPasswordReset",
+    "ep:api POST /graphql/",
+    "ep:api GET /graphql/",
+    "ep:api GET /.well-known/jwks.json"
+   ],
+   "boxes": [
+    "core.acc.auth",
+    "core.api.auth",
+    "core.acc.oidc",
+    "dash.sh.auth"
+   ],
+   "flows": [
+    "flow.core-accounts.staff-sign-in",
+    "flow.core-accounts.oidc-sign-in",
+    "flow.core-api.graphql-request",
+    "flow.dash-shell.sign-in"
+   ]
+  },
+  {
+   "id": "feat.config",
+   "name": "Configuration",
+   "summary": "Configure sales channels, tax settings and store-wide settings."
+  },
+  {
+   "id": "feat.config.channels",
+   "parent": "feat.config",
+   "name": "Sales channels",
+   "summary": "Create and configure sales channels with currencies, countries, warehouses and payment apps.",
+   "entry": [
+    "f:saleor/saleor/graphql/channel/mutations/channel_create.py#ChannelCreate",
+    "f:saleor/saleor/graphql/channel/mutations/channel_update.py#ChannelUpdate",
+    "f:saleor/saleor/graphql/channel/mutations/channel_delete.py#ChannelDelete",
+    "f:saleor-dashboard/src/channels/views/ChannelsList/ChannelsList.tsx",
+    "f:saleor-dashboard/src/channels/views/ChannelDetails/ChannelDetails.tsx"
+   ],
+   "boxes": [
+    "core.cat.channels",
+    "dash.cat.channels"
+   ],
+   "flows": [
+    "flow.dash-catalog.channel-setup"
+   ]
+  },
+  {
+   "id": "feat.config.taxes",
+   "parent": "feat.config",
+   "name": "Tax configuration",
+   "summary": "Configure per-channel tax strategy with flat rates, country exceptions and tax classes.",
+   "entry": [
+    "f:saleor/saleor/graphql/tax/mutations/tax_configuration_update.py#TaxConfigurationUpdate",
+    "f:saleor/saleor/graphql/tax/mutations/tax_exemption_manage.py#TaxExemptionManage",
+    "f:saleor-dashboard/src/taxes/views/TaxChannelsList.tsx",
+    "f:saleor-dashboard/src/taxes/views/TaxCountriesList.tsx",
+    "f:saleor-dashboard/src/taxes/views/TaxClassesList.tsx"
+   ],
+   "boxes": [
+    "core.co.tax",
+    "dash.cat.taxes"
+   ]
+  },
+  {
+   "id": "feat.config.store",
+   "parent": "feat.config",
+   "name": "Store settings",
+   "summary": "Set the store name, company address and notification recipients for staff alerts.",
+   "entry": [
+    "f:saleor/saleor/graphql/shop/mutations/shop_settings_update.py#ShopSettingsUpdate",
+    "f:saleor/saleor/graphql/shop/mutations/shop_address_update.py#ShopAddressUpdate",
+    "f:saleor/saleor/graphql/shop/mutations/gift_card_settings_update.py#GiftCardSettingsUpdate",
+    "f:saleor/saleor/graphql/shop/mutations/refund_settings_update.py#RefundSettingsUpdate",
+    "f:saleor-dashboard/src/siteSettings/views/index.tsx",
+    "f:saleor-dashboard/src/notificationsSettings/views/NotificationsHub.tsx",
+    "f:saleor-dashboard/src/notificationsSettings/views/StaffEmails.tsx"
+   ],
+   "boxes": [
+    "core.api.shop",
+    "dash.cat.store"
+   ]
+  },
+  {
+   "id": "feat.apps",
+   "name": "Apps and integrations",
+   "summary": "Install and manage apps that extend Saleor through webhooks, email, search and tax integrations."
+  },
+  {
+   "id": "feat.apps.integration",
+   "parent": "feat.apps",
+   "name": "App installation",
+   "summary": "Install, configure and manage third-party apps and plugins through their manifests.",
+   "entry": [
+    "f:saleor/saleor/graphql/app/mutations/app_install.py#AppInstall",
+    "f:saleor/saleor/graphql/app/mutations/app_fetch_manifest.py#AppFetchManifest",
+    "f:saleor/saleor/graphql/app/mutations/app_create.py#AppCreate",
+    "f:saleor/saleor/graphql/app/mutations/app_update.py#AppUpdate",
+    "f:saleor/saleor/graphql/app/mutations/app_token_create.py#AppTokenCreate",
+    "ep:api GET /plugins/channel/{channel_slug}/{plugin_id}/",
+    "ep:api POST /plugins/channel/{channel_slug}/{plugin_id}/",
+    "ep:api GET /plugins/global/{plugin_id}/"
+   ],
+   "boxes": [
+    "core.wh.apps",
+    "core.wh.plugins",
+    "dash.ext.install",
+    "dash.ext.manage"
+   ],
+   "flows": [
+    "flow.core-webhooks.app-install",
+    "flow.dash-shell.app-install",
+    "flow.dash-shell.extension-mounts"
+   ]
+  },
+  {
+   "id": "feat.apps.integration-plugins",
+   "parent": "feat.apps",
+   "name": "Plugin endpoints",
+   "summary": "Receive incoming HTTP calls for channel-scoped and global plugins from storefronts.",
+   "entry": [
+    "ep:api POST /plugins/global/{plugin_id}/",
+    "ep:api GET /plugins/{plugin_id}/",
+    "ep:api POST /plugins/{plugin_id}/"
+   ],
+   "boxes": [
+    "core.wh.plugins"
+   ]
+  },
+  {
+   "id": "feat.apps.webhooks",
+   "parent": "feat.apps",
+   "name": "Webhooks",
+   "summary": "Create and manage webhook subscriptions that notify apps of store events in real time.",
+   "entry": [
+    "f:saleor/saleor/graphql/webhook/mutations/webhook_create.py#WebhookCreate",
+    "f:saleor/saleor/graphql/webhook/mutations/webhook_update.py#WebhookUpdate",
+    "f:saleor/saleor/graphql/webhook/mutations/webhook_delete.py#WebhookDelete",
+    "f:saleor/saleor/graphql/webhook/mutations/webhook_dry_run.py#WebhookDryRun",
+    "f:saleor/saleor/graphql/webhook/mutations/webhook_trigger.py#WebhookTrigger",
+    "f:saleor/saleor/graphql/webhook/mutations/event_delivery_retry.py#EventDeliveryRetry"
+   ],
+   "boxes": [
+    "core.wh.async",
+    "core.wh.sync",
+    "core.wh.store",
+    "core.wh.gql.webhook"
+   ],
+   "flows": [
+    "flow.core-webhooks.order-async",
+    "flow.core-api.metadata-update"
+   ]
+  },
+  {
+   "id": "feat.apps.notifications",
+   "parent": "feat.apps",
+   "name": "Email notifications",
+   "summary": "Send transactional emails for orders, fulfilments, invoices and gift cards via SMTP.",
+   "entry": [
+    "ep:smtp POST /api/manifest",
+    "ep:smtp POST /api/register",
+    "ep:smtp POST /api/trpc/{trpc}",
+    "ep:smtp POST /api/cron/cleanup-stale-installations",
+    "ep:smtp POST /api/cron/set-deprecation",
+    "ep:smtp POST /api/webhooks/app-deleted",
+    "ep:smtp POST /api/webhooks/notify",
+    "ep:smtp POST /api/webhooks/order-created",
+    "ep:smtp POST /api/webhooks/order-confirmed",
+    "ep:smtp POST /api/webhooks/order-fulfilled",
+    "ep:smtp POST /api/webhooks/order-fully-paid",
+    "ep:smtp POST /api/webhooks/order-cancelled",
+    "ep:smtp POST /api/webhooks/order-refunded",
+    "ep:smtp POST /api/webhooks/invoice-sent",
+    "ep:smtp POST /api/webhooks/gift-card-sent"
+   ],
+   "boxes": [
+    "apps.smtp",
+    "apps.sm.sending"
+   ],
+   "flows": [
+    "flow.apps-others.order-email"
+   ]
+  },
+  {
+   "id": "feat.apps.search",
+   "parent": "feat.apps",
+   "name": "Product search",
+   "summary": "Index products, variants, categories and pages in Algolia and keep them in sync via webhooks.",
+   "entry": [
+    "ep:search POST /api/manifest",
+    "ep:search POST /api/register",
+    "ep:search POST /api/setup-indices",
+    "ep:search POST /api/webhooks-status",
+    "ep:search POST /api/trpc/{trpc}",
+    "ep:search POST /api/cron/cleanup-stale-installations",
+    "ep:search POST /api/webhooks/app-deleted",
+    "ep:search POST /api/webhooks/saleor/product_created",
+    "ep:search POST /api/webhooks/saleor/product_updated",
+    "ep:search POST /api/webhooks/saleor/product_deleted",
+    "ep:search POST /api/webhooks/saleor/product_variant_created",
+    "ep:search POST /api/webhooks/saleor/product_variant_updated",
+    "ep:search POST /api/webhooks/saleor/product_variant_deleted",
+    "ep:search POST /api/webhooks/saleor/product_variant_out_of_stock",
+    "ep:search POST /api/webhooks/saleor/product_variant_back_in_stock",
+    "ep:search POST /api/webhooks/saleor/category_created",
+    "ep:search POST /api/webhooks/saleor/category_updated",
+    "ep:search POST /api/webhooks/saleor/category_deleted",
+    "ep:search POST /api/webhooks/saleor/page_created",
+    "ep:search POST /api/webhooks/saleor/page_updated",
+    "ep:search POST /api/webhooks/saleor/page_deleted"
+   ],
+   "boxes": [
+    "apps.search",
+    "apps.se.indexing"
+   ],
+   "flows": [
+    "flow.x.edit-to-search",
+    "flow.apps-others.product-index"
+   ]
+  },
+  {
+   "id": "feat.apps.tax",
+   "parent": "feat.apps",
+   "name": "Tax integration",
+   "summary": "Calculate checkout and order taxes via AvaTax and commit transactions on order confirmation.",
+   "entry": [
+    "ep:avatax GET /api/manifest",
+    "ep:avatax POST /api/register",
+    "ep:avatax POST /api/webhooks/checkout-calculate-taxes",
+    "ep:avatax POST /api/webhooks/order-calculate-taxes",
+    "ep:avatax POST /api/webhooks/order-confirmed",
+    "ep:avatax POST /api/webhooks/order-cancelled",
+    "ep:avatax POST /api/order-details",
+    "ep:avatax POST /api/trpc/{trpc}",
+    "ep:avatax GET /api/cron/cleanup-stale-installations"
+   ],
+   "boxes": [
+    "apps.avatax",
+    "apps.av.calc"
+   ],
+   "flows": [
+    "flow.apps-others.checkout-taxes",
+    "flow.core-webhooks.sync-tax",
+    "flow.dash-catalog.tax-app"
+   ]
+  }
+ ],
+ "reference": {
+  "name": "Sample commerce checklist",
+  "items": [
+   {
+    "text": "Product catalog with variants and attributes",
+    "state": "matched",
+    "feature": "feat.catalog.products"
+   },
+   {
+    "text": "Multiple sales channels and currencies",
+    "state": "matched",
+    "feature": "feat.config.channels"
+   },
+   {
+    "text": "Promotions and discount codes",
+    "state": "matched",
+    "feature": "feat.discounts"
+   },
+   {
+    "text": "Gift cards",
+    "state": "matched",
+    "feature": "feat.payments.gift-cards"
+   },
+   {
+    "text": "Tax calculation",
+    "state": "matched",
+    "feature": "feat.config.taxes"
+   },
+   {
+    "text": "Shipping zones and methods",
+    "state": "matched",
+    "feature": "feat.orders.shipping"
+   },
+   {
+    "text": "Inventory across several warehouses",
+    "state": "matched",
+    "feature": "feat.orders.warehouses"
+   },
+   {
+    "text": "Order fulfilment and returns",
+    "state": "matched",
+    "feature": "feat.orders.fulfilment"
+   },
+   {
+    "text": "Refunds",
+    "state": "matched",
+    "feature": "feat.orders.refunds"
+   },
+   {
+    "text": "Customer accounts and addresses",
+    "state": "matched",
+    "feature": "feat.accounts.customers"
+   },
+   {
+    "text": "Staff roles and permissions",
+    "state": "matched",
+    "feature": "feat.accounts.permissions"
+   },
+   {
+    "text": "Webhooks for integrations",
+    "state": "matched",
+    "feature": "feat.apps.webhooks"
+   },
+   {
+    "text": "Product search",
+    "state": "matched",
+    "feature": "feat.apps.search"
+   },
+   {
+    "text": "Wishlists",
+    "state": "not found",
+    "searched": [
+     "wishlist",
+     "saved items",
+     "favorite product",
+     "saved_items"
+    ]
+   },
+   {
+    "text": "Product reviews and ratings",
+    "state": "not found",
+    "searched": [
+     "product review",
+     "product rating",
+     "review mutation",
+     "rating field"
+    ],
+    "found": [
+     "saleor/saleor/product/migrations/0133_product_variant_channel_listing.py:41",
+     "saleor/saleor/graphql/core/descriptions.py:31",
+     "saleor/saleor/graphql/product/sorters.py:30"
+    ]
+   },
+   {
+    "text": "Subscriptions and recurring orders",
+    "state": "not found",
+    "searched": [
+     "subscription",
+     "recurring order",
+     "recurring billing",
+     "scheduled order"
+    ],
+    "found": [
+     "map: core.webhooks",
+     "map: apps.av.tooling",
+     "map: d:saleor-apps/apps/avatax/src/modules/webhooks/definitions"
+    ]
+   },
+   {
+    "text": "Abandoned cart recovery emails",
+    "state": "not found",
+    "searched": [
+     "abandoned cart email",
+     "cart recovery",
+     "checkout abandonment email",
+     "recovery notification"
+    ]
+   },
+   {
+    "text": "Loyalty points",
+    "state": "not found",
+    "searched": [
+     "loyalty",
+     "loyalty points",
+     "rewards program",
+     "loyalty_points"
+    ],
+    "found": [
+     "saleor-dashboard/src/customerTypes/components/CustomerTypeAttributes/messages.ts:12",
+     "saleor-dashboard/src/attributes/components/AttributeOrganization/messages.ts:26",
+     "apps/apps/smtp/src/modules/event-handlers/default-payloads.ts:53"
+    ]
+   }
+  ]
+ }
+}

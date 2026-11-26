@@ -3,7 +3,7 @@
 usage:
   python3 -I anonymize.py --rules PRIVATE_RULES.json --src SRC_DIR --out OUT_DIR
 
-SRC_DIR holds skeleton.json, parts/*.json and (optionally) flows.json and topo.config.json.
+SRC_DIR holds skeleton.json, parts/*.json and (optionally) flows.json, features.json and topo.config.json.
 Every string is rewritten (ids, paths and JSON keys included) so references stay consistent. The rules file is a list of [pattern, replacement] or
 [pattern, replacement, "case"] entries applied in order. "case" entries match
 case-insensitively and copy the source's casing (ACME -> NORTHWIND, acme -> northwind).
@@ -81,7 +81,7 @@ def main():
     rules, leaks = load_rules(a.rules)
 
     files = [os.path.join(a.src, "skeleton.json")] + sorted(glob.glob(os.path.join(a.src, "parts", "*.json")))
-    for extra in ("flows.json", "topo.config.json"):
+    for extra in ("flows.json", "features.json", "topo.config.json"):
         if os.path.exists(os.path.join(a.src, extra)):
             files.append(os.path.join(a.src, extra))
 

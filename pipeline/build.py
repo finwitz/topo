@@ -8,6 +8,7 @@ MAP_DIR holds:
   skeleton.json       the predefined top levels (regions, subsystems, external services)
   parts/*.json        slices written by mapping agents (see pipeline/SCHEMA.md)
   flows.json          optional cross-area guided flows
+  features.json       optional feature tree for the Features view (see features.py)
 
 Writes MAP_DIR/topo-data.json and the page (default MAP_DIR/dist/index.html), with the Topo shell
 (viewer/shell.html: the theme and top bar every Topo page shares) in it.
@@ -23,9 +24,12 @@ import html
 import json
 import os
 import re
+import sys
 from collections import Counter, defaultdict
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import features as feature_tree  # noqa: E402
 KEEP = ["id", "parent", "name", "kind", "summary", "detail", "paths", "status", "tech", "facts",
         "signature", "code", "source", "repo", "provenance", "message", "phase", "date", "capabilities", "repo_key", "eyebrow", "tag",
         "url", "url_label", "abbrev"]
@@ -236,6 +240,9 @@ def main():
         here = os.path.basename(out_page)
         meta["views"] = [{**{k: x[k] for k in ("label", "short", "href") if k in x}, **({"current": True} if x["href"] == here else {})} for x in views]
     data = {"meta": meta, "nodes": [nodes[i] for i in order], "edges": edges, "flows": flows}
+    ftp = os.path.join(adir, "features.json")
+    if os.path.exists(ftp):
+        data.update(feature_tree.embed(data, json.load(open(ftp))))
     json.dump(data, open(os.path.join(adir, "topo-data.json"), "w"), ensure_ascii=False, indent=1)
 
     tpl = fill_shell(open(a.template).read())
@@ -246,6 +253,8 @@ def main():
 
     print(f"parts: {len(parts)}  nodes: {len(order)}  edges: {len(edges)}  flows: {len(flows)} "
           f"({sum(1 for f in flows if f.get('featured'))} featured)")
+    if data.get("features"):
+        print(f"features: {len(data['features'])}" + (f", reference items: {len(data['reference']['items'])}" if data.get("reference") else ""))
     print("kinds:", dict(Counter(nodes[i]["kind"] for i in order).most_common()))
     print("resolution:", dict(sorted(log.items())))
     for k in ("dup_nodes", "reparented", "unresolved"):

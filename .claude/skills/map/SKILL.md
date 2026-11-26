@@ -104,6 +104,11 @@ repository at standard cost about 4.
 8. **Featured flows.** Pick 2 to 5: with several areas, write ones that cross them in `<map>/flows.json`,
    every sentence checked against the boxes; with one area, feature the agent's best flows. List them as
    `"feature": [["<flow id>", "short label"], ...]` in `flows.json`, and run `finish.py <map>` once more.
+   **Features (optional).** When the user wants the Features view (what the product does, and its gaps
+   against a roadmap, PRD or feature list they give you), run
+   `python3 -I <topo>/pipeline/features.py brief <map> [--reference <their list>] --out <map>/features-brief.md`
+   and give the brief to one agent (Sonnet in Claude Code) to write `<map>/features.json`; then run
+   `finish.py <map>` once more. Keep the user's list in the map folder, never in the Topo repository.
 9. **Verify findings.** Agents report defects and doc-versus-code mismatches in their replies. Re-read
    each one in the code (or have an agent do it and reply with the result) with a verdict, severity,
    evidence and the smallest fix, then write them to `<map>/FINDINGS.md` yourself: subagents reply, they
