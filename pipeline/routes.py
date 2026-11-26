@@ -8,9 +8,10 @@ id. It also makes the routes that callers use but no server declares stand out a
 
 Reads FastAPI (APIRouter prefixes and include_router prefixes), Flask (@app.route with methods),
 Express-style JavaScript or TypeScript (router.get('/path', ...)) and Go (net/http HandleFunc,
-Gin/Echo groups, and chi Route blocks; http.Handle and chi Mount are not yet read, and Go Group
-variables are tracked per file by name). Paths come out as declared, with the router prefix; tests
-are skipped. Read the result: a route registered dynamically will not appear.
+gorilla/mux .Methods(...) on the same line, Gin/Echo groups, and chi Route blocks; http.Handle and
+chi Mount are not yet read, and Go Group variables are tracked per file by name). Paths come out as
+declared, with the router prefix; tests and vendor/ folders are skipped. Read the result: a route
+registered dynamically will not appear.
 """
 import argparse
 import json
@@ -26,8 +27,10 @@ JS_ROUTE = re.compile(r'\b(?:router|app|server|api)\.(get|post|put|patch|delete)
 GO_GROUP = re.compile(r'\b(\w+)\s*:?=\s*(\w+)\.Group\(\s*["`]([^"`]*)["`]')
 GO_CHI_ROUTE = re.compile(r'\b(\w+)\.Route\(\s*["`]([^"`]*)["`]\s*,\s*func\(\s*(\w+)\b')
 GO_HANDLE = re.compile(r'\b\w+\.HandleFunc\(\s*["`]([^"`]+)["`]')
+GO_MUX_METHODS = re.compile(r'\.Methods\(([^)]*)\)')
+GO_MUX_METHOD = re.compile(r'"(\w+)"|\bhttp\.Method(\w+)')
 GO_METHOD = re.compile(r'\b(\w+)\.(GET|POST|PUT|PATCH|DELETE|Get|Post|Put|Patch|Delete)\(\s*["`]([^"`]*)["`]')
-SKIP_DIRS = {"node_modules", ".git", "__pycache__", "dist", "build", ".venv", "venv"}
+SKIP_DIRS = {"node_modules", ".git", "__pycache__", "dist", "build", ".venv", "venv", "vendor"}
 
 
 def is_test(path):
@@ -63,15 +66,22 @@ def _collect_go(text, rel):
             parent, prefix, inner_var = rm.groups()
             base_prefix = next((p for _, v, p in reversed(route_stack) if v == parent), groups.get(parent, ""))
             route_stack.append((depth + code.count("{") - code.count("}"), inner_var, _join_path(base_prefix, prefix)))
-        for hm in GO_HANDLE.finditer(code):
+        handles = list(GO_HANDLE.finditer(code))
+        for i, hm in enumerate(handles):
             raw = hm.group(1).strip()
             parts = raw.split(None, 1)
             if len(parts) == 2 and parts[0].upper() in {"GET", "POST", "PUT", "PATCH", "DELETE"}:
-                method, path = parts[0].upper(), parts[1]
+                methods, path = [parts[0].upper()], parts[1]
             else:
-                method, path = "GET", raw
+                methods, path = ["GET"], raw
+                # gorilla/mux: r.HandleFunc("/orders", h).Methods("POST", http.MethodPut), one row per method
+                tail = code[hm.end():handles[i + 1].start() if i + 1 < len(handles) else len(code)]
+                xm = GO_MUX_METHODS.search(tail)
+                if xm:
+                    named = [(a or b).upper() for a, b in GO_MUX_METHOD.findall(xm.group(1))]
+                    methods = list(dict.fromkeys(named)) or methods
             if path.startswith("/"):
-                rows.append((method, path, f"{rel}:{lineno}"))
+                rows.extend((method, path, f"{rel}:{lineno}") for method in methods)
         for mm in GO_METHOD.finditer(code):
             var, method, path = mm.groups()
             if not path.startswith("/"):
