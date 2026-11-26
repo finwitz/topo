@@ -187,6 +187,11 @@ and says when a clone has moved on since its map was made. It needs only Python.
 - **Details.** Click a box for how it works, its files, what it uses and what uses it.
 - **Guided flows.** Narrated walkthroughs that fly the camera along a real path through the system,
   step by step, with replay.
+- **Features (optional).** What the product does for its users, as a tree of areas and features, each
+  one citing the boxes that build it and marked built, partial or documents only. Give it a roadmap,
+  a PRD or a competitor's feature list and it scores the list against the code: matched, not found
+  (with the terms searched for, run again by a script), or to check by hand. One agent writes it from
+  the finished map, for a few dollars (`pipeline/features.py`); click a feature to light it up on the map.
 - **Insights.** The strongest coupling between subsystems, the most depended-on parts, unfinished work
   with the most dependents, and build status by subsystem.
 - **Stack, search, boundaries and export.** Every outside service and technology, search with `/`,

@@ -114,6 +114,37 @@ calls, links to other areas by their predictable ids, and links to external serv
 `flows.json` may also hold `"feature": [["<flow id>", "short label"], ...]`: those flows are
 listed first and offered on the start-up card.
 
+## Features
+
+`features.json` (optional, in the map folder) is the tree the viewer's Features view draws: what
+the product does for its users, each feature citing the boxes that build it, and the gaps against a
+reference list. It is written after the map, from the map, by one agent with
+`pipeline/features.py brief`, and checked with `features.py check` (which `finish.py` runs).
+
+```json
+{ "features": [
+    { "id": "feat.checkout", "name": "Checkout", "summary": "one sentence" },
+    { "id": "feat.checkout.gift-cards", "parent": "feat.checkout", "name": "Gift cards",
+      "summary": "one sentence", "entry": ["<box id>"], "boxes": ["<box id>"], "flows": ["<flow id>"] } ],
+  "reference": { "name": "Roadmap", "items": [
+    { "text": "Gift cards", "state": "matched", "feature": "feat.checkout.gift-cards" },
+    { "text": "Saved carts", "state": "not found", "searched": ["saved cart", "persist checkout"] },
+    { "text": "Marketplace", "state": "out of scope" } ] } }
+```
+
+- Three levels at most (area > feature > sub-feature); ids `feat.<area>[.<feature>[.<part>]]`.
+- A feature with no sub-features cites at least one box: `entry` (where a user reaches it) and
+  `boxes` (the rest that builds it). `flows` names guided flows that walk through it.
+- Status is never written: the build works it out from the boxes (`built`, `partial` when a box or
+  anything inside it is partial, a stub or planned, `docs` when every box is known only from
+  documents).
+- A reference item is `matched` (naming its feature), `not found` (listing the terms searched for)
+  or `out of scope` (set only by the product's owner). The check runs a not-found item's terms over
+  the checkout and the map and writes any hits into its `found`; such an item shows as "check by
+  hand". Nothing is ever called missing.
+- The check fails when fewer than 80% of the map's endpoints or 90% of its flows belong to a
+  feature.
+
 ## Ids
 
 Ids make references between slices resolvable without coordination. Follow them exactly.
