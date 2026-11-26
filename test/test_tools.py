@@ -134,6 +134,17 @@ class Tools(unittest.TestCase):
             '}\n',
         )
         self.repo.write(
+            "srv/mux.go",
+            'package main\nfunc routes(r *mux.Router) {\n'
+            '\tr.HandleFunc("/orders", createOrder).Methods("POST")\n'
+            '\tr.HandleFunc("/orders/{id}", order).Methods(http.MethodPut, "DELETE")\n'
+            '}\n',
+        )
+        self.repo.write(
+            "srv/vendor/github.com/acme/kit/kit.go",
+            'package kit\nfunc init() { http.HandleFunc("/vendored", nil) }\n',
+        )
+        self.repo.write(
             "srv/routes_test.go",
             'package main\nfunc TestX() { http.HandleFunc("/ignored", nil) }\n',
         )
@@ -147,7 +158,13 @@ class Tools(unittest.TestCase):
         self.assertIn(["POST", "/api/v1/orders", "srv/gin_echo.go:6"], rows)
         self.assertIn(["GET", "/items/{id}", "srv/chi.go:4"], rows)
         self.assertIn(["DELETE", "/items/{id}", "srv/chi.go:5"], rows)
+        self.assertIn(["POST", "/orders", "srv/mux.go:3"], rows)
+        self.assertNotIn(["GET", "/orders", "srv/mux.go:3"], rows)
+        self.assertIn(["PUT", "/orders/{id}", "srv/mux.go:4"], rows)
+        self.assertIn(["DELETE", "/orders/{id}", "srv/mux.go:4"], rows)
+        self.assertNotIn(["GET", "/orders/{id}", "srv/mux.go:4"], rows)
         self.assertFalse(any(p == "/ignored" for _, p, _ in rows))
+        self.assertFalse(any(p == "/vendored" for _, p, _ in rows))
         self.assertFalse(any(loc.startswith("srv/client.go:") for _, _, loc in rows))
 
     def test_brief_catches_double_ownership(self):
