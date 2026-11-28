@@ -3,7 +3,11 @@
  "repository": "https://github.com/modelcontextprotocol/python-sdk",
  "license": "MIT",
  "about": "The Model Context Protocol's official Python SDK: clients, servers, the high-level server API, transports and OAuth.",
- "cost_usd": 36,
+ "tokens": {
+  "total": 55332314,
+  "cache_read": 52268679,
+  "output": 429150
+ },
  "minutes": 33,
  "depth": "standard",
  "mapped": "2026-11-24"
