@@ -11,6 +11,10 @@ the map against the code it cites.
 
 ![Topo in 16 seconds: from the whole system down to one function, the code it cites, what calls what, and the one command that starts a map](docs/topo-16s.gif)
 
+The full tour, 48 seconds with sound:
+
+https://github.com/user-attachments/assets/f2e601e3-e675-4e6e-b285-9ace4b36fec0
+
 **What it costs.** Topo is free and open source. A map runs on your own Claude Code or Codex plan: about
 4 US dollars for a small repository, and for werkzeug (about 180 code files) from 13 as an overview to
 36 at full depth.
