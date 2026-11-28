@@ -260,20 +260,22 @@ viewer/shell.html            the shell every Topo page shares: theme, top bar an
 pipeline/SCHEMA.md           the slice format mapping agents write
 pipeline/*.py                init, checkout, routes, brief, validate, build, refs, symcheck, depthcheck, finish,
                              analyze, stack_report, drift, contracts, skim, anonymize, generalize, leakscan,
-                             settings, depths (depths.json: overview, standard, deep), mcp_server (the map
-                             server for coding agents)
+                             settings, depths (depths.json: overview, standard, deep), features (the
+                             Features view), mcp_server (the map server for coding agents)
 hooks/                       the leak guard as a pre-commit hook
 test/                        unit tests, the browser smoke test and run.sh
 maps/saleor/                 the example map: config, skeleton, slices, flows, page and analysis
 .claude/skills/              map, refresh and share: the skills, for Claude Code, Codex or any agent
 .claude-plugin/              the Claude Code plugin, and this repository as its own plugin marketplace
 .codex-plugin/, .agents/     the same plugin, its map server and marketplace for Codex
+.github/                     the checks on every pull request, and the readme check
 ```
 
 ## Contributing
 
 Issues and pull requests are welcome; [`CONTRIBUTING.md`](CONTRIBUTING.md) says how to run the checks
-and what a change needs. Report security problems privately, as [`SECURITY.md`](SECURITY.md) describes.
+and what a change needs; a change to what Topo does updates this README in the same pull request.
+Report security problems privately, as [`SECURITY.md`](SECURITY.md) describes.
 
 ## License
 
