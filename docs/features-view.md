@@ -97,9 +97,10 @@ An overlay like `flows.json`, not part of the code hierarchy:
 4. `finish.py` runs it when the map has a `features.json`.
 
 Cost, measured on the Saleor example (three repositories, 2,120 boxes, an 18-item checklist):
-$2.83 and 13 minutes on Sonnet, against $30 or more for the map itself. The tree came out at 8
-areas and 39 features, claiming 68 of 70 endpoints and 34 of 35 flows; of the checklist, 13
-matched, 2 not found and 3 to check by hand, each checked in the code.
+about 3.5 million tokens (91% read from cache, 64 thousand written) and 13 minutes on Sonnet, against
+36 to 61 million tokens for a gallery map. The tree came out at 8 areas and 39 features, claiming 68
+of 70 endpoints and 34 of 35 flows; of the checklist, 13 matched, 2 not found and 3 to check by hand,
+each checked in the code.
 
 ## The view
 

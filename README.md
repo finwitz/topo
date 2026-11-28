@@ -15,9 +15,9 @@ The full tour, 48 seconds with sound:
 
 https://github.com/user-attachments/assets/f2e601e3-e675-4e6e-b285-9ace4b36fec0
 
-**What it costs.** Topo is free and open source. A map runs on your own Claude Code or Codex plan: about
-4 US dollars for a small repository, and for werkzeug (about 180 code files) from 13 as an overview to
-36 at full depth.
+**What it costs.** Topo is free and open source. A map runs on your own Claude Code or Codex plan and
+uses its tokens: about 4.4 million for a small repository, and 26 to 70 million for werkzeug (about 180
+code files), 93 to 98% of them re-read from the prompt cache. The numbers for each run are below.
 
 Codebases grow until nobody can draw the whole system, and the documents drift from what the code
 does. Topo is a way to get the real picture back: agents read the code in parallel and write
@@ -34,7 +34,7 @@ three applications, with every one of its 835 function-level boxes citing a line
 analysis is in [`maps/saleor/ANALYSIS.md`](maps/saleor/ANALYSIS.md).
 
 The same website link opens the **gallery**: FastAPI, the MCP Python SDK and Hono, each mapped with
-Topo at standard depth for 26 to 36 US dollars, with their sources in [`gallery/`](gallery/).
+Topo at standard depth with 36 to 61 million tokens each, with their sources in [`gallery/`](gallery/).
 
 ![The Saleor example map at its top level: three applications, the outside services they use, and the connections between them](docs/saleor-overview.jpg)
 
@@ -111,17 +111,27 @@ anywhere static. `ANALYSIS.md` (coupling, the most depended-on parts, duplicatio
 `BUILDOUT.md` (a draft plan) sit next to it.
 
 **How long, and how much.** At standard depth, a small repository (up to about a hundred code files) is
-one agent and takes 15 to 30 minutes. Larger code gets one agent per area of about 100 to 300 boxes, all running in
-parallel, so the time stays about the same while usage grows: the Saleor example took eleven agents.
+one agent and takes minutes. Larger code gets one agent per area of about 100 to 300 boxes, all running
+in parallel, so the time stays about the same while usage grows: the Saleor example took eleven agents.
 Each agent works through a full context of reading, so the skill tells you the plan and waits for your
-yes before it launches more than four. In Claude Code the mapping agents run on Sonnet, which in our tests
-mapped as deep as Opus for less, since the depth check holds every map to the same floors; ask for
-another model when you start the map if you want one. A small repository cost about 4 US dollars this
-way, against about 6 with Opus throughout. Depth and size move the cost most: werkzeug (about 180 code
-files and 600 public definitions) cost about 31 US dollars at standard depth, split into eight areas,
-with 346 function-level boxes; an overview of it cost about 13, with 199 boxes, split into six areas
-where one would have done; deep cost about 36 and took 47 minutes, with 830 boxes and every one of its
-623 public definitions boxed.
+yes before it launches more than four. In Claude Code the mapping agents run on Sonnet, which in our
+tests mapped as deep as Opus at a lower price per token, since the depth check holds every map to the
+same floors; ask for another model when you start the map if you want one.
+
+Measured on 28 November 2026 in Claude Code (Opus 5.5 planning, Sonnet 5.5 mapping), counting every
+token the session and its agents read or wrote:
+
+| Repository | Depth | Agents | Tokens | From cache | Written | Minutes | Boxes |
+|---|---|---|---|---|---|---|---|
+| itsdangerous (15 Python files) | standard | 1 | 4.4 million | 93% | 48 thousand | 7 | 123 |
+| werkzeug (about 180 code files) | overview | 1 | 26 million | 98% | 150 thousand | 21 | 263 |
+| werkzeug | standard | 3 | 70 million | 98% | 420 thousand | 24 | 650 |
+| werkzeug | deep | 7 | 54 million | 96% | 550 thousand | 17 | 1,067 |
+
+Almost every token is an agent re-reading its own context from the prompt cache, so how the work is
+split moves the total more than depth does: werkzeug at deep, in seven small areas, used fewer tokens
+than at standard in three large ones, while the tokens written grow with depth. Deep boxed 617 of
+werkzeug's 623 public definitions.
 
 **What it touches.** Your repositories are read only: Topo maps committed files from `git archive`, so
 uncommitted work never reaches the map and nothing in your clone changes. Topo runs no service of its
@@ -195,7 +205,8 @@ and says when a clone has moved on since its map was made. It needs only Python.
   one citing the boxes that build it and marked built, partial or documents only. Give it a roadmap,
   a PRD or a competitor's feature list and it scores the list against the code: matched, not found
   (with the terms searched for, run again by a script), or to check by hand. One agent writes it from
-  the finished map, for a few dollars (`pipeline/features.py`); click a feature to light it up on the map.
+  the finished map, with about 3.5 million tokens on the Saleor example (`pipeline/features.py`); click
+  a feature to light it up on the map.
 - **Insights.** The strongest coupling between subsystems, the most depended-on parts, unfinished work
   with the most dependents, and build status by subsystem.
 - **Stack, search, boundaries and export.** Every outside service and technology, search with `/`,

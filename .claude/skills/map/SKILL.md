@@ -39,9 +39,11 @@ user wants something in between ("standard, but lighter"), offer to define a dep
 `"depths"` in Topo's config file, as `python3 -I <topo>/pipeline/depths.py --help` describes; no depth can
 turn off the precision checks.
 
-Deeper costs more: on werkzeug (about 180 code files and 600 public definitions), an overview cost 13
-US dollars, standard 31 and deep 36 (both of the first split into more areas than suggested). A small
-repository at standard cost about 4.
+Most of a map's tokens are agents re-reading their own context, so the size of each area moves the
+total more than depth does. On werkzeug (about 180 code files and 600 public definitions) an overview
+used about 26 million tokens with one agent, standard 70 million with three and deep 54 million with
+seven; a small repository at standard used about 4.4 million. Tell the user these figures when they
+ask what a depth costs.
 
 1. **Start the map.** `python3 -I <topo>/pipeline/init.py <repo> [<repo> ...] [--name <name>] [--out <folder>] [--depth <depth>]`
    writes `topo.config.json`, `skeleton.json`, `clones.json`, a read-only `checkout/` from `git archive`

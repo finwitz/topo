@@ -6,8 +6,12 @@ Each map here has its own folder with the sources a map needs (topo.config.json,
 parts/, flows.json) and a gallery.json that says where it came from:
 
   {"name": "FastAPI", "repository": "https://github.com/fastapi/fastapi", "license": "MIT",
-   "about": "one line on the project", "depth": "standard", "cost_usd": 32, "minutes": 40,
-   "mapped": "2026-11-24"}
+   "about": "one line on the project", "depth": "standard", "minutes": 40, "mapped": "2026-11-24",
+   "tokens": {"total": 36363674, "cache_read": 34375456, "output": 345989}}
+
+"tokens" is what the run used, summed from its Claude Code transcripts (the session and its mapping
+agents): every token read or written, the share of them read from the prompt cache, and the tokens
+written.
 
 The index also lists the example map in maps/saleor. Every number on the index is read from the
 built maps, never typed in.
@@ -38,12 +42,22 @@ def counts(data):
             "symbols": symbols, "apps": sum(1 for n in data["nodes"] if n.get("kind") == "app")}
 
 
+def tokens(n):
+    """36363674 -> "36 million", 4427250 -> "4.4 million", 345989 -> "350 thousand"."""
+    if n >= 10_000_000:
+        return f"{n / 1e6:.0f} million"
+    if n >= 1_000_000:
+        return f"{n / 1e6:.1f} million"
+    return f"{round(n, -4) // 1000:,} thousand"
+
+
 def card(entry, c, href):
     commit = (entry.get("commit") or "")[:7]
     facts = [f"{c['boxes']:,} boxes", f"{c['connections']:,} connections", f"{c['flows']} flows"]
     made = [f"{entry['depth']} depth"]
-    if entry.get("cost_usd"):
-        made.append(f"about {entry['cost_usd']} US dollars")
+    t = entry.get("tokens")
+    if t:
+        made.append(f"about {tokens(t['total'])} tokens, {round(100 * t['cache_read'] / t['total'])}% from cache")
     if entry.get("minutes"):
         made.append(f"{entry['minutes']} minutes")
     src = html.escape(entry["repository"])
@@ -75,7 +89,7 @@ def main():
         saleor = counts(json.load(f))
     example = {"name": "Saleor", "about": "The open-source commerce platform: its API, its Dashboard and four of its apps, "
                "mapped as one system.", "repository": "https://github.com/saleor", "license": "BSD 3-Clause",
-               "depth": "standard", "cost_usd": None, "minutes": 30}
+               "depth": "standard", "minutes": 30}
     cards = card(example, saleor, "../maps/saleor/dist/index.html") + "".join(card(e, c, h) for e, c, h in entries)
     page = PAGE.replace("<!--CARDS-->", cards)
     with open(os.path.join(HERE, "index.html"), "w", encoding="utf-8") as f:

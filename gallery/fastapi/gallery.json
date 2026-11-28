@@ -3,7 +3,11 @@
  "repository": "https://github.com/fastapi/fastapi",
  "license": "MIT",
  "about": "The Python web framework: routing, dependency injection, request and response handling, OpenAPI and security.",
- "cost_usd": 26,
+ "tokens": {
+  "total": 36363674,
+  "cache_read": 34375456,
+  "output": 345989
+ },
  "minutes": 34,
  "depth": "standard",
  "mapped": "2026-11-24"
