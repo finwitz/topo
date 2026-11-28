@@ -31,6 +31,14 @@ never a user's or a client's map.
 - Every box cites files. Knowledge from documents only is marked `"source": "docs"`.
 - Verify every finding a mapping agent reports in the code before it goes anywhere.
 
+## README
+
+- A pull request that changes what Topo does (`pipeline/`, `viewer/`, `hooks/`, the skills, the plugin
+  or `MAPPING_PLAYBOOK.md`) updates `README.md` in the same pull request, or its description has a line
+  that starts `README: no change` and says why. The `readme` check fails otherwise.
+- Before merging any pull request, a contributor's included, read the README against the change: the
+  commands, what the map does, the layout and the costs it states. Fix what it misses first.
+
 ## Checks
 
 `sh test/run.sh` runs the unit tests, the leak scan, a rebuild of the example map that must match

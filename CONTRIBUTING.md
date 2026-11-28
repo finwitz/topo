@@ -34,7 +34,11 @@ through [`SECURITY.md`](SECURITY.md), not an issue.
      runs it on a throwaway git repository, like the ones already there.
 3. Write plainly: specific words, numbers with units, acronyms spelled out on first use, no em
    dashes. That holds for code comments, docs and the text a map shows.
-4. One change per pull request, with a commit message that says what it does in the area it touches,
+4. Keep `README.md` true. A change to the pipeline, the viewer, the hooks, the skills or the plugin
+   updates the README in the same pull request. If the README needs nothing, add a line to the pull
+   request's description that starts `README: no change` and says why, for example
+   `README: no change, tests only`. The `readme` check fails until one of the two is there.
+5. One change per pull request, with a commit message that says what it does in the area it touches,
    for example `Viewer: keep the selected box when the theme changes`.
 
 ## The leak guard

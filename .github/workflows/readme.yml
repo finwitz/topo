@@ -1,0 +1,25 @@
+# A pull request that changes what Topo does (the pipeline, the viewer, the hooks, the skills or the
+# plugin) updates README.md in the same pull request, or says why not in its description with a line
+# that starts "README: no change". It runs again when the description is edited.
+name: readme
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  readme:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: README.md updated, or a reason given
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: python3 -I .github/scripts/readme_check.py "$BASE_SHA"
